@@ -1,0 +1,47 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.env
+
+# Local settings and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/local.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+# Generated artifacts and IDE caches
+**/.gradle/
+**/.kotlin/
+**/.idea/
+**/build/
+**/out/
+*.apk
+*.aab
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+*.log
+*.hprof
+*.iml
+*.db
+*.mv.db
+*.trace.db
+
+# Local Run background process state and logs
+.local/

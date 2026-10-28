@@ -1,0 +1,30 @@
+# Local settings and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/local.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+# Generated artifacts and IDE caches
+**/.gradle/
+**/.kotlin/
+**/.idea/
+**/build/
+**/out/
+*.apk
+*.aab
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+*.log
+*.hprof
+*.iml
+*.db
+*.mv.db
+*.trace.db
+
+# Local Run background process state and logs
+.local/

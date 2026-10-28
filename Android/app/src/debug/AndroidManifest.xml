@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Overlay SOLO para builds debug.
+
+    Permite tráfico HTTP plano mientras se prueba el backend local:
+      - Emulador Android: http://10.0.2.2:8080/
+      - Dispositivo físico: http://<IP-LAN-del-PC>:8080/
+
+    El build release NO incluye este archivo, por lo que sigue exigiendo HTTPS.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application android:usesCleartextTraffic="true" />
+
+</manifest>
