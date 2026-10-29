@@ -14,4 +14,15 @@ class TokenPolicyTest {
     @Test void wrongClientIsRejected() { assertTrue(validator.validate(token("access","other")).hasErrors()); }
     @Test void idTokenIsRejected() { assertTrue(validator.validate(token("id","our-client")).hasErrors()); }
     @Test void validAccessClaimsAreAccepted() { assertFalse(validator.validate(token("access","our-client")).hasErrors()); }
+    @Test void androidAndWebClientsAreAcceptedExactly() {
+        var multiple = new CognitoAccessTokenValidator(" android-client, web-client ");
+        assertFalse(multiple.validate(token("access", "android-client")).hasErrors());
+        assertFalse(multiple.validate(token("access", "web-client")).hasErrors());
+        assertTrue(multiple.validate(token("access", "web")).hasErrors());
+        assertTrue(multiple.validate(token("id", "web-client")).hasErrors());
+    }
+    @Test void emptyAllowlistFailsClosed() {
+        assertTrue(new CognitoAccessTokenValidator(" , ").validate(token("access", "our-client")).hasErrors());
+        assertTrue(new CognitoAccessTokenValidator(null).validate(token("access", "our-client")).hasErrors());
+    }
 }

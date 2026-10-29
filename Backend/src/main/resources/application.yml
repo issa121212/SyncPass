@@ -38,6 +38,8 @@ aws:
     region: ${AWS_REGION:us-east-1}
     user-pool-id: ${AWS_COGNITO_USER_POOL_ID:us-east-1_xxxxxxxxx}
     client-id: ${AWS_COGNITO_CLIENT_ID:xxxxxxxxxxxxxxxxxxxxxxxxxx}
+    # Lista exacta de clientes que pueden consumir la API. Conserva Android por defecto.
+    allowed-client-ids: ${AWS_COGNITO_ALLOWED_CLIENT_IDS:${AWS_COGNITO_CLIENT_ID:xxxxxxxxxxxxxxxxxxxxxxxxxx}}
     client-secret: ${AWS_COGNITO_CLIENT_SECRET:}
 
 # Configuración CORS

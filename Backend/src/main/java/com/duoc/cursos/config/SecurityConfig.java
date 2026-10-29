@@ -43,7 +43,7 @@ public class SecurityConfig {
             CorsProperties corsProperties,
             @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuerUri,
             @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}") String jwkSetUri,
-            @Value("${aws.cognito.client-id}") String clientId
+            @Value("${aws.cognito.allowed-client-ids:${aws.cognito.client-id}}") String clientId
     ) {
         this.corsProperties = corsProperties;
         this.issuerUri = issuerUri;
