@@ -26,7 +26,7 @@ Si se reinicia ADB o se reconecta el USB, ejecutar SyncPass Local otra vez para 
 
 El perfil local del backend usa H2 en memoria: pierde los datos al detener el proceso. Room conserva datos por dispositivo/cuenta y los recintos locales no se sincronizan al servidor. La asistencia pendiente se confirma al sincronizar con la API.
 
-El formato QR actual conserva compatibilidad con identificadores existentes; no implementa una credencial firmada de corta duracion ni prueba antifraude de presencia. Las pruebas con PostgreSQL real y la infraestructura productiva deben validarse antes de desplegar.
+El formato QR actual conserva compatibilidad con identificadores existentes; no implementa una credencial firmada de corta duracion ni prueba antifraude de presencia. El CRUD y el flujo QR ya se validaron con PostgreSQL real y Flyway; ver [POSTGRESQL.md](POSTGRESQL.md). La infraestructura productiva, la concurrencia y la carga siguen pendientes de validar.
 
 La version interna Android se mantiene para permitir actualizaciones sobre instalaciones existentes. El nombre del repositorio no cambia el applicationId, los callbacks Cognito ni el nombre de la aplicacion.
 

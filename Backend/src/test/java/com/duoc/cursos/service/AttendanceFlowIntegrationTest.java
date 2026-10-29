@@ -60,7 +60,7 @@ class AttendanceFlowIntegrationTest {
         mvc.perform(put("/api/eventos/" + event + "/asistencias/me").with(participant)
             .contentType(MediaType.APPLICATION_JSON).content("{\"esPresente\":true}"))
             .andExpect(status().isForbidden());
-        String scan = "{\"codigoQr\":\"SYNC_PASS:ASISTENCIA:" + event + ":" + user + "\",\"clientUuid\":\"flow-test\"}";
+        String scan = "{\"codigoQr\":\"SYNC_PASS:ASISTENCIA:" + event + ":" + user + "\",\"clientUuid\":\"flow-test-" + event + "\"}";
         mvc.perform(post("/api/eventos/" + event + "/asistencias/escanear").with(participant)
             .contentType(MediaType.APPLICATION_JSON).content(scan)).andExpect(status().isForbidden());
         mvc.perform(post("/api/eventos/" + event + "/asistencias/escanear").with(receiver)
