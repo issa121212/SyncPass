@@ -72,6 +72,10 @@ fun SyncPassApp(
                 onGuardarEncuesta = vm::guardarEncuesta,
                 onEscanear = { navController.navigate("scanner/$id") },
                 onLimpiarMensaje = vm::limpiarMensaje,
+                onGuardarEvento = vm::guardarEvento,
+                onEliminarEvento = vm::eliminarEvento,
+                onCancelarEvento = vm::cancelarEvento,
+                onLimpiarErrorEdicion = vm::limpiarErrorEdicion,
             )
         }
 

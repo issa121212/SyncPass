@@ -52,7 +52,8 @@ class V14UiTest {
         compose.setContent { SyncPassTheme { EventoDetalleScreen(
             state = EventoDetalleUiState(evento = event, perfil = profile),
             onBack = {}, onRefresh = {}, onInscribirse = {}, onGuardarEncuesta = { _, _, _ -> },
-            onEscanear = {}, onLimpiarMensaje = {}) } }
+            onEscanear = {}, onLimpiarMensaje = {}, onGuardarEvento = {},
+            onEliminarEvento = {}, onCancelarEvento = {}, onLimpiarErrorEdicion = {}) } }
         compose.onNodeWithText("Mostrar QR para asistencia").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Código QR").assertIsDisplayed()
         compose.onNodeWithText("SYNC_PASS:ASISTENCIA:7:3").assertDoesNotExist()

@@ -37,6 +37,12 @@ interface SyncPassDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun guardarEvento(item: EventoEntity)
 
+    @Query("DELETE FROM eventos WHERE id = :id")
+    suspend fun eliminarEvento(id: Long)
+
+    @Query("SELECT COUNT(*) FROM pendientes WHERE eventoId = :id AND sincronizado = 0 AND rechazado = 0")
+    suspend fun pendientesDelEvento(id: Long): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun guardarPerfil(item: PerfilEntity)
 
