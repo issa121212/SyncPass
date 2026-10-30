@@ -40,6 +40,12 @@ interface SyncPassApi {
     @POST("api/eventos")
     suspend fun crearEvento(@Body request: EventoRequest): EventoResponse
 
+    @PUT("api/eventos/{id}")
+    suspend fun editarEvento(@Path("id") id: Long, @Body request: EventoRequest): EventoResponse
+
+    @DELETE("api/eventos/{id}")
+    suspend fun eliminarEvento(@Path("id") id: Long)
+
     @POST("api/eventos/inscribirse")
     suspend fun inscribirse(@Body request: InscribirseRequest): EventoResponse
 

@@ -191,7 +191,7 @@ fun HomeScreen(
     }
     if (mostrarEvento) {
         EventoDialog(
-            proyectos = state.proyectos,
+            proyectos = state.proyectos.filter { com.rojas.syncpass.domain.model.puedeGestionarProyecto(it, state.perfil) },
             recintos = state.recintos,
             onDismiss = { mostrarEvento = false },
             onGuardar = onCrearEvento,

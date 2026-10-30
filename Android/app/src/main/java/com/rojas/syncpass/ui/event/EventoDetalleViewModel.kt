@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.rojas.syncpass.domain.model.Evento
+import com.rojas.syncpass.domain.model.*
 import com.rojas.syncpass.domain.model.Perfil
 import com.rojas.syncpass.domain.model.Asistente
 import com.rojas.syncpass.domain.model.EncuestaEvento
@@ -19,6 +20,11 @@ import kotlinx.coroutines.launch
 data class EventoDetalleUiState(
     val evento: Evento? = null,
     val perfil: Perfil? = null,
+    val proyectos: List<Proyecto> = emptyList(),
+    val guardando: Boolean = false,
+    val eliminado: Boolean = false,
+    val revisionGuardado: Int = 0,
+    val errorEdicion: String? = null,
     val asistentes: List<Asistente> = emptyList(),
     val encuestas: List<EncuestaEvento> = emptyList(),
     val cargando: Boolean = false,
@@ -32,6 +38,9 @@ data class EventoDetalleUiState(
             ?.filter { it.isNotBlank() }
             ?.toSet()
             .orEmpty()
+
+    val puedeGestionar: Boolean
+        get() = evento?.let { e -> proyectos.any { it.id == e.proyectoId && puedeGestionarProyecto(it, perfil) } } == true
 
     val esDocente: Boolean
         get() = rolesSet.any { it.equals("DOCENTE", true) || it.equals("ADMIN", true) }
@@ -54,21 +63,29 @@ class EventoDetalleViewModel(
     private data class Extras(
         val asistentes: List<Asistente> = emptyList(),
         val encuestas: List<EncuestaEvento> = emptyList(),
+        val guardando: Boolean = false,
+        val eliminado: Boolean = false,
+        val revisionGuardado: Int = 0,
+        val errorEdicion: String? = null,
         val cargando: Boolean = false,
         val mensaje: String? = null,
         val error: String? = null,
     )
 
+    private var mutando = false
     private val extras = MutableStateFlow(Extras())
 
     val uiState = combine(
         repository.observarEvento(eventoId),
         repository.perfil,
+        repository.proyectos,
         extras,
-    ) { evento, perfil, extra ->
+    ) { evento, perfil, proyectos, extra ->
         EventoDetalleUiState(
             evento = evento,
             perfil = perfil,
+            proyectos = proyectos, guardando = extra.guardando, eliminado = extra.eliminado,
+            revisionGuardado = extra.revisionGuardado, errorEdicion = extra.errorEdicion,
             asistentes = extra.asistentes,
             encuestas = extra.encuestas,
             cargando = extra.cargando,
@@ -82,6 +99,7 @@ class EventoDetalleViewModel(
     }
 
     fun refrescar() {
+        if (mutando || extras.value.eliminado) return
         viewModelScope.launch {
             extras.update { it.copy(cargando = true, error = null) }
             repository.refrescarEvento(eventoId).onFailure { e ->
@@ -120,6 +138,41 @@ class EventoDetalleViewModel(
                 .onSuccess { extras.update { it.copy(mensaje = "Encuesta guardada") } }
                 .onFailure { e -> extras.update { it.copy(error = "No se pudo guardar: ${e.message}") } }
             extras.update { it.copy(cargando = false) }
+        }
+    }
+
+    fun guardarEvento(input: EventoInput) = modificar(false) {
+        val actual = repository.observarEvento(eventoId).first() ?: error("Evento no disponible")
+        require(input.cupos == 0 || input.cupos >= actual.inscritos) { "El cupo no puede ser menor que los inscritos" }
+        repository.editarEvento(eventoId, input).getOrThrow()
+    }
+
+    fun cancelarEvento() = modificar(false) {
+        val actual = repository.refrescarEvento(eventoId).getOrThrow()
+        repository.editarEvento(eventoId, actual.toInput().copy(estado = "CANCELADO")).getOrThrow()
+    }
+
+    fun eliminarEvento() = modificar(true) { repository.eliminarEvento(eventoId).getOrThrow() }
+
+    fun limpiarErrorEdicion() { extras.update { it.copy(errorEdicion = null) } }
+
+    private fun modificar(eliminar: Boolean, operation: suspend () -> Any) {
+        if (mutando || !uiState.value.puedeGestionar || extras.value.cargando) return
+        mutando = true
+        extras.update { it.copy(guardando = true, errorEdicion = null) }
+        viewModelScope.launch {
+            try {
+                operation()
+                extras.update { it.copy(eliminado = eliminar, revisionGuardado = it.revisionGuardado + 1,
+                    mensaje = if (eliminar) null else "Evento guardado en el servidor") }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                extras.update { it.copy(errorEdicion = e.message ?: "No se pudo completar la operación") }
+            } finally {
+                mutando = false
+                extras.update { it.copy(guardando = false) }
+            }
         }
     }
 

@@ -1,5 +1,11 @@
 package com.rojas.syncpass.ui.event
 
+import androidx.activity.compose.BackHandler
+import com.rojas.syncpass.domain.model.EventoInput
+import com.rojas.syncpass.domain.model.puedeGestionarProyecto
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.layout.Box
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -59,7 +65,43 @@ fun EventoDetalleScreen(
     onGuardarEncuesta: (Int, Int, String) -> Unit,
     onEscanear: () -> Unit,
     onLimpiarMensaje: () -> Unit,
+    onGuardarEvento: (EventoInput) -> Unit,
+    onEliminarEvento: () -> Unit,
+    onCancelarEvento: () -> Unit,
+    onLimpiarErrorEdicion: () -> Unit,
 ) {
+    var editar by remember { mutableStateOf(false) }
+    var confirmar by remember { mutableStateOf<String?>(null) }
+    var menu by remember { mutableStateOf(false) }
+    BackHandler(enabled = state.guardando) { }
+    LaunchedEffect(state.eliminado) { if (state.eliminado) onBack() }
+    LaunchedEffect(state.revisionGuardado) {
+        if (state.revisionGuardado > 0) { editar = false; confirmar = null }
+    }
+    if (editar && state.evento != null) {
+        EventoEditorDialog(
+            inicial = state.evento,
+            proyectos = state.proyectos.filter { puedeGestionarProyecto(it, state.perfil) },
+            onDismiss = { if (!state.guardando) editar = false },
+            onGuardar = onGuardarEvento, guardando = state.guardando,
+            errorGuardado = state.errorEdicion,
+        )
+    }
+    confirmar?.let { accion ->
+        AlertDialog(
+            onDismissRequest = { if (!state.guardando) confirmar = null },
+            title = { Text(if (accion == "eliminar") "Eliminar evento" else "Cancelar evento") },
+            text = { Column {
+                Text(if (accion == "eliminar") "¿Eliminar ${state.evento?.nombre}? Esta acción no se puede deshacer. El servidor impedirá eliminarlo si tiene historial."
+                    else "¿Cancelar ${state.evento?.nombre}? Se conservarán sus inscripciones y asistencias.")
+                state.errorEdicion?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            } },
+            confirmButton = { TextButton(enabled = !state.guardando, onClick = {
+                if (accion == "eliminar") onEliminarEvento() else onCancelarEvento()
+            }) { Text(if (state.guardando) "Procesando…" else "Confirmar") } },
+            dismissButton = { TextButton(enabled = !state.guardando, onClick = { confirmar = null }) { Text("Volver") } },
+        )
+    }
     val snackbar = remember { SnackbarHostState() }
     var mostrarEncuesta by remember { mutableStateOf(false) }
     var mostrarQr by remember { mutableStateOf(false) }
@@ -77,12 +119,27 @@ fun EventoDetalleScreen(
             TopAppBar(
                 title = { Text(state.evento?.nombre ?: "Evento") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = onBack, enabled = !state.guardando) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 actions = {
-                    TextButton(onClick = onRefresh) { Text("Actualizar") }
+                    TextButton(onClick = onRefresh, enabled = !state.guardando && !state.cargando) { Text("Actualizar") }
+                    if (state.puedeGestionar) Box {
+                        TextButton(onClick = { menu = true }, enabled = !state.guardando && !state.cargando) { Text("Gestionar") }
+                        DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                            DropdownMenuItem(text = { Text("Editar") }, onClick = {
+                                menu = false; onLimpiarErrorEdicion(); editar = true
+                            })
+                            DropdownMenuItem(text = { Text("Cancelar evento") }, enabled = state.evento?.estado != "CANCELADO", onClick = {
+                                menu = false; onLimpiarErrorEdicion(); confirmar = "cancelar"
+                            })
+                            val sinHistorial = state.evento?.let { it.inscritos == 0 && it.presentes == 0 } == true
+                            DropdownMenuItem(text = { Text(if (sinHistorial) "Eliminar" else "Eliminar (tiene historial)") }, enabled = sinHistorial, onClick = {
+                                menu = false; onLimpiarErrorEdicion(); confirmar = "eliminar"
+                            })
+                        }
+                    }
                 },
             )
         },
@@ -109,6 +166,7 @@ fun EventoDetalleScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            Text(evento.estado.replace('_', ' '), style = MaterialTheme.typography.labelMedium)
             Text(evento.proyectoNombre, style = MaterialTheme.typography.labelLarge)
             Text(evento.nombre, style = MaterialTheme.typography.headlineSmall)
             Text(FechaUtils.mostrar(evento.fechaHora), style = MaterialTheme.typography.bodyLarge)
