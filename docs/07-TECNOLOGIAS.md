@@ -34,7 +34,7 @@ Versiones tomadas del código revisado, no de recomendaciones de actualización.
 
 `:cognito-auth` es un módulo interno reutilizable, no un paquete externo publicado. Android Keystore/AES-GCM y LocationManager son APIs de plataforma, no librerías agregadas. No se utilizan React, Tailwind o rutas web dentro de Android.
 
-Parámetros declarados: applicationId `com.rojas.syncpass`, versión APK 1.6.2, versionCode 9, minSdk 24 y target/compile SDK 37. El número de versión de la APK debe interpretarse junto con la revisión del código utilizada para generar el artefacto.
+Parámetros declarados: applicationId `com.rojas.syncpass`, versión APK 1.7.0, versionCode 10, minSdk 24 y target/compile SDK 37. El número de versión de la APK debe interpretarse junto con la revisión del código utilizada para generar el artefacto.
 
 ## Backend fs2-api / Backend
 

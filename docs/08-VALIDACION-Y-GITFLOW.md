@@ -2,6 +2,8 @@
 
 ## Evidencia disponible
 
+Para preparar Android 1.7.0 (versionCode 10) se ejecutaron testDebugUnitTest, lintDebug, assembleDebug y assembleRelease con resultado correcto: 31 pruebas unitarias, sin fallos ni omisiones. Lint conserva advertencias existentes. Se generó una APK debug firmada con la clave de desarrollo y un artefacto release sin firma de distribución; este último debe firmarse antes de instalarlo como release. Las seis pruebas instrumentadas indicadas más abajo corresponden a la validación anterior del CRUD, no a una repetición durante esta preparación.
+
 La validación combina revisión de código, pruebas automatizadas y comprobaciones manuales del comportamiento con el backend desplegado. Los resultados siguientes corresponden a las ejecuciones registradas durante el desarrollo; no implican una medición de todos los escenarios posibles.
 
 ### Validación del CRUD de eventos
