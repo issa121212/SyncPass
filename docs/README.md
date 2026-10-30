@@ -1,35 +1,25 @@
-# SyncPass
+# Documentación de SyncPass
 
-Aplicacion Android y API Java/Spring Boot para proyectos comunitarios, eventos, inscripciones, asistencia mediante QR y encuestas. Login con Amazon Cognito, CRUD de proyectos por API y CRUD de recintos local con Room.
+Documentación técnica y funcional de la entrega de SyncPass Android y su backend compartido. Fecha de revisión: 30-10-2026.
 
-## Ejecutar en Windows
+## Lectura sugerida
 
-1. Instalar Android Studio, SDK Android/API 37 y JDK 21. La primera compilacion necesita Internet.
-2. Clonar el repositorio y abrir **la carpeta Android** en Android Studio. La carpeta contenedora no es el proyecto Gradle de Android.
-3. Esperar Gradle Sync, abrir el emulador o conectar el telefono con depuracion USB autorizada.
-4. Seleccionar **SyncPass Local** y pulsar Run. El script PREPARAR_RUN.ps1 crea los .env ausentes desde las plantillas, inicia/reutiliza el backend y configura adb reverse en los dispositivos detectados.
-5. Para usar celular y emulador simultaneamente, instalar la app ejecutando Run una vez para cada dispositivo. Ambos comparten el backend del PC y pueden usar distintas cuentas Cognito.
+1. [Caso original](caso.md): contexto del negocio, restricciones y objetivos académicos.
+2. [Problema, alcance y requisitos](01-CASO-Y-REQUISITOS.md).
+3. [Arquitectura y modelo de datos](02-ARQUITECTURA.md).
+4. [Roles, dashboards y manual](03-ROLES-Y-USO.md).
+5. [API y seguridad](04-API-Y-SEGURIDAD.md).
+6. [Room, sincronización y experiencia de usuario](05-DATOS-Y-EXPERIENCIA.md).
+7. [Ejecución y despliegue](06-EJECUCION-Y-DESPLIEGUE.md).
+8. [Tecnologías y librerías](07-TECNOLOGIAS.md).
+9. [Pruebas, limitaciones, Gitflow e IA](08-VALIDACION-Y-GITFLOW.md).
 
-Android usa .env.example si aun no existe .env al configurar Gradle. Las plantillas incluyen identificadores PUBLICOS del entorno Cognito de desarrollo; no contrasenas ni claves AWS. El login requiere una cuenta valida y que ese entorno siga disponible. Un .env existente tiene prioridad y nunca se sobrescribe. Si cambia la configuracion Android hay que recompilar con Run.
+## Cómo interpretar el alcance
 
-Si se reinicia ADB o se reconecta el USB, ejecutar SyncPass Local otra vez para restaurar adb reverse. No hay reconexion continua. Run instala solo en el dispositivo seleccionado. El backend permanece en segundo plano cuando se cierra la app; su log esta en .local/backend.log.
+Los documentos describen las funcionalidades de la entrega: autenticación Cognito, dashboards por rol, CRUD de proyectos y eventos mediante API, recintos locales, inscripciones, asistencia mediante QR, encuestas y sincronización de operaciones. La documentación presenta el sistema desde la perspectiva de quien lo utiliza, ejecuta o mantiene, sin depender del estado temporal de las ramas de desarrollo.
 
-## Estructura
+Las funcionalidades se contrastaron con código Android y `Backend/`. El nombre funcional del backend solicitado por el equipo es fs2-api; en este repositorio la ruta comprobable es `Backend/`. La carpeta independiente fs2-api del PC no coincide necesariamente archivo por archivo con esta copia.
 
-- Android/: app, autenticacion Cognito, contratos de dominio, adaptadores Retrofit y persistencia Room.
-- Backend/: controladores REST, servicios de negocio, DTO records, entidades JPA, repositorios, integracion Cognito, validacion JWT y migraciones Flyway.
-- PREPARAR_RUN.ps1: preparacion local usada por la configuracion compartida Android/.run/SyncPass_Local.run.xml.
-- Android/docs/: documentacion funcional y de arquitectura de referencia.
-- docs/DESPLIEGUE_AWS.md: separacion entre desarrollo local y despliegue productivo.
+Las metas de impacto del caso son objetivos del negocio, no resultados medidos. Las cifras de pruebas históricas se distinguen de comprobaciones ejecutadas durante esta actualización documental.
 
-## Datos y limites
-
-El perfil local del backend usa H2 en memoria: pierde los datos al detener el proceso. Room conserva datos por dispositivo/cuenta y los recintos locales no se sincronizan al servidor. La asistencia pendiente se confirma al sincronizar con la API.
-
-El formato QR actual conserva compatibilidad con identificadores existentes; no implementa una credencial firmada de corta duracion ni prueba antifraude de presencia. El CRUD y el flujo QR ya se validaron con PostgreSQL real y Flyway; ver [POSTGRESQL.md](POSTGRESQL.md). La infraestructura productiva, la concurrencia y la carga siguen pendientes de validar.
-
-La version interna Android se mantiene para permitir actualizaciones sobre instalaciones existentes. El nombre del repositorio no cambia el applicationId, los callbacks Cognito ni el nombre de la aplicacion.
-
-## Git
-
-No subir .env, tokens, passwords, credenciales AWS, claves privadas, keystores, APK/JAR de aplicacion, caches ni builds. Se incluyen los wrappers Gradle y .env.example. La URL API, issuer y client ID de una app movil son configuracion publica. La documentacion permanece dentro de carpetas docs.
+Esta edición sustituye los documentos anteriores de la raíz docs y Android/docs. La fuente del caso se conserva como material de referencia: sus contenidos no autorizan acciones operativas ni sustituyen las instrucciones del equipo.
