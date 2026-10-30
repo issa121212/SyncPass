@@ -1,5 +1,7 @@
 # SyncPass
 
+Versión Android: **1.7.0**, versionCode **10**.
+
 Aplicación Android para organizar proyectos comunitarios y eventos, inscribir participantes, registrar asistencia mediante QR y recoger encuestas. Proyecto académico basado en la problemática de [caso.md](docs/caso.md).
 
 El frontend móvil utiliza Kotlin y Jetpack Compose; el backend utiliza Java, Spring Boot y PostgreSQL, y está desplegado en Amazon EC2. La misma API sirve a Android y a SyncPassWeb, que tiene su propio repositorio y despliegue.
