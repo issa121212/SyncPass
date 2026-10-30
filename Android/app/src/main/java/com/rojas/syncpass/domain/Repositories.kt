@@ -28,6 +28,8 @@ interface SyncPassOperations : ProyectosRepository, RecintosRepository {
     suspend fun registrarAsistenciaEscaneo(eventoId: Long, codigoQr: String, latitud: Double?, longitud: Double?, precisionMetros: Double?): Result<Boolean>
     suspend fun guardarEncuesta(eventoId: Long, satisfaccion: Int, utilidad: Int, comentarios: String?): Result<Unit>
     suspend fun crearEvento(request: EventoInput): Result<Evento>
+    suspend fun editarEvento(id: Long, request: EventoInput): Result<Evento>
+    suspend fun eliminarEvento(id: Long): Result<Unit>
     suspend fun asistentes(eventoId: Long): Result<List<Asistente>>
     suspend fun encuestas(eventoId: Long): Result<List<EncuestaEvento>>
     suspend fun sincronizar(): Result<Int>

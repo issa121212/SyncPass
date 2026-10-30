@@ -146,11 +146,23 @@ class SyncPassRepository(
         dao.marcarEncuesta(eventoId)
         sincronizar()
     }
-    override suspend fun crearEvento(request: EventoInput): Result<Evento> = resultado {
+    override suspend fun crearEvento(request: EventoInput): Result<Evento> = syncMutex.withLock { resultado {
+        request.validar()
         val evento = api.crearEvento(request.toRequest())
         dao.guardarEvento(evento.toEntity())
         evento.toEntity().toDomain()
-    }
+    } }
+    override suspend fun editarEvento(id: Long, request: EventoInput): Result<Evento> = syncMutex.withLock { resultado {
+        request.validar()
+        val evento = api.editarEvento(id, request.toRequest()).toEntity()
+        dao.guardarEventoConPendientes(evento)
+        evento.toDomain()
+    } }
+    override suspend fun eliminarEvento(id: Long): Result<Unit> = syncMutex.withLock { resultado {
+        require(dao.pendientesDelEvento(id) == 0) { "Sincroniza las operaciones pendientes antes de eliminar el evento" }
+        api.eliminarEvento(id)
+        dao.eliminarEvento(id)
+    } }
     override suspend fun asistentes(eventoId: Long): Result<List<Asistente>> =
         resultado { api.asistentes(eventoId).map { it.toDomain() } }
     override suspend fun encuestas(eventoId: Long): Result<List<EncuestaEvento>> =
