@@ -1,4 +1,5 @@
 import java.util.Properties
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 // On a fresh extraction the IDE configures Gradle before Before Launch can copy .env.
 // The example contains PUBLIC endpoints/client identifiers, never tokens or secrets.
@@ -29,9 +30,14 @@ val cognitoLogout: String = envOr("COGNITO_LOGOUT_URI", cognitoRedirect)
 val cognitoScopes: String = envOr("COGNITO_SCOPES", "email openid phone")
 
 plugins {
+    jacoco
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+}
+
+jacoco {
+    toolVersion = "0.8.14"
 }
 
 android {
@@ -62,6 +68,8 @@ android {
 
     buildTypes {
         debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = providers.gradleProperty("syncpassInstrumentedCoverage").orNull == "true"
             if (providers.gradleProperty("syncpassTestInstall").orNull == "true") {
                 applicationIdSuffix = ".validation"
             }
@@ -133,5 +141,27 @@ dependencies {
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
+}
+
+if (providers.gradleProperty("syncpassInstrumentedCoverage").orNull == "true") {
+    val unitCoverage = layout.buildDirectory.file("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    val deviceCoverage = fileTree(layout.buildDirectory.dir("outputs/code_coverage/debugAndroidTest")) {
+        include("**/*.ec")
+    }
+    tasks.register<JacocoReport>("syncPassDebugCoverageReport") {
+        group = "verification"
+        description = "Combina la cobertura unitaria e instrumentada del módulo Android :app."
+        dependsOn("createDebugUnitTestCoverageReport", "createDebugAndroidTestCoverageReport")
+        executionData.setFrom(unitCoverage, deviceCoverage)
+        classDirectories.setFrom(
+            layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes"),
+            layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes"),
+        )
+        sourceDirectories.setFrom("src/main/java")
+        reports {
+            html.required.set(true)
+            xml.required.set(true)
+        }
     }
 }

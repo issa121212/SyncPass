@@ -17,7 +17,30 @@ La validación combina revisión de código, pruebas automatizadas y comprobacio
 - La prueba no alteró los eventos del usuario con historial. El evento temporal ya fue eliminado.
 - Se completó una segunda comprobación cruzada Android-web con la API real, ejecutada por el integrante del equipo: creó un evento temporal desde Android y confirmó su aparición en ambos clientes; editó nombre y cupos conservando fecha/hora; canceló y comprobó que seguía existiendo; finalmente eliminó el evento y confirmó su desaparición de ambos. Los resultados fueron comunicados por el usuario durante la prueba guiada, no observados mediante automatización del navegador.
 
-Las pruebas del CRUD verifican comportamiento y persistencia. No constituyen una medición de rendimiento ni cobertura porcentual.
+Las pruebas del CRUD verifican comportamiento y persistencia. La cobertura se mide por separado con JaCoCo.
+
+## Cobertura Android con JaCoCo
+
+El reporte combinado mide la variante `debug` del módulo Android `:app`. Reúne las pruebas unitarias y las pruebas instrumentadas de interfaz, Room y sesión. La tarea usa los datos de ejecución de ambas suites para contar cada línea cubierta una sola vez.
+
+La primera medición con 31 pruebas unitarias cubrió 336 de 3.388 líneas (9,92 %). El informe combinado se generó con 35 pruebas unitarias y 12 instrumentadas, todas aprobadas en su entorno correspondiente. Las instrumentadas se ejecutaron en un Pixel 10 emulado con Android 17. El informe incluye las clases generadas por Room del módulo `:app`.
+
+| Métrica | Cubiertas | Total | Cobertura |
+|---|---:|---:|---:|
+| Líneas | 1.492 | 3.390 | 44,01 % |
+| Instrucciones | 17.600 | 37.367 | 47,10 % |
+| Ramas | 639 | 1.683 | 37,97 % |
+
+Desde `Android/`, con un emulador conectado y seleccionado por `ANDROID_SERIAL`, ejecutar en PowerShell:
+
+```powershell
+$env:ANDROID_SERIAL = 'emulator-5554'
+$clases = 'EventoEditorUiTest','HomeScreenRegressionTest','LocalCrudUiTest','RecintoRoomTest','SessionSecurityTest','V14UiTest'
+$suite = ($clases | ForEach-Object { "com.rojas.syncpass.$_" }) -join ','
+.\gradlew.bat :app:syncPassDebugCoverageReport -PsyncpassInstrumentedCoverage=true -PsyncpassTestInstall=true "-Pandroid.testInstrumentationRunnerArguments.class=$suite"
+```
+
+El informe HTML se genera en `app/build/reports/jacoco/syncPassDebugCoverageReport/html/index.html`. El sufijo `.validation` aísla la instalación utilizada para las pruebas. Esta selección puede ejecutarse con datos controlados y sin depender de la disponibilidad de EC2.
 
 ### Pruebas presentes en el código
 
@@ -75,7 +98,7 @@ Crear y probar controles reales con el backend no sustituye probar errores contr
 - QR sin firma/caducidad; no protege por sí solo contra copia o suplantación.
 - Ubicación referencial, sin validación obligatoria de distancia en backend.
 - No existe validación formal de todos los dispositivos, accesibilidad completa o carga masiva.
-- No hay medición del impacto del negocio, SLA, cobertura porcentual ni garantía de tiempos inferiores a cinco segundos.
+- No hay medición del impacto del negocio, SLA ni garantía de tiempos inferiores a cinco segundos.
 - Base local con información que no está cifrada como los tokens; revisar almacenamiento según sensibilidad del uso real.
 - Tema dinámico: azul observado no equivale a paleta fija universal.
 - No hay reportes institucionales exportables ni cancelación individual de inscripciones implementada en la API descrita.

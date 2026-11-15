@@ -1,6 +1,78 @@
 # Arquitectura y modelo de datos
 
-## Vista general
+## C1 · Contexto del sistema
+
+```mermaid
+flowchart LR
+    docente["Docente"]
+    estudiante["Estudiante voluntario"]
+    participante["Participante"]
+    syncpass["SyncPass<br/>Gestiona proyectos, eventos y asistencia"]
+    cognito["Amazon Cognito<br/>Servicio externo de identidad"]
+    docente -->|"Gestiona proyectos y eventos"| syncpass
+    estudiante -->|"Escanea QR en recepción"| syncpass
+    participante -->|"Se inscribe, presenta su QR y responde encuestas"| syncpass
+    syncpass -->|"Delega el inicio de sesión y verifica los tokens"| cognito
+```
+
+## C2 · Contenedores y servicios de infraestructura
+
+```mermaid
+flowchart LR
+    cognito["Amazon Cognito<br/>OpenID Connect"]
+    subgraph sistema["SyncPass"]
+        android["Aplicación Android<br/>Kotlin y Compose"]
+        room[("Datos locales del dispositivo<br/>Room / SQLite")]
+        web["Aplicación web<br/>React, alojada en Vercel"]
+        gateway["Amazon API Gateway<br/>Entrada pública de la API"]
+        subgraph ec2["Amazon EC2"]
+            nginx["Nginx<br/>Proxy inverso HTTPS"]
+            api["API REST<br/>Java y Spring Boot"]
+            postgres[("Base de datos del servidor<br/>PostgreSQL")]
+        end
+        android -->|"Lee y escribe datos locales"| room
+        android -->|"HTTPS y access token"| gateway
+        web -->|"HTTPS y access token"| gateway
+        gateway -->|"HTTPS · 443"| nginx
+        nginx -->|"HTTP local · 8080"| api
+        api -->|"JDBC local · 5432"| postgres
+    end
+    android -->|"Inicio de sesión y canje del código"| cognito
+    web -->|"Inicio de sesión y canje del código"| cognito
+    api -->|"Consulta claves públicas JWKS"| cognito
+```
+
+Los clientes obtienen sus tokens de Cognito y envían el access token a la API. Spring Security valida el token y el backend aplica los permisos. El diagrama muestra PostgreSQL en EC2, que es el despliegue documentado. La conexión a Supabase queda pendiente.
+
+## C3 · Componentes de la aplicación Android
+
+```mermaid
+flowchart TB
+    backend["API REST de SyncPass"]
+    sqlite[("SQLite del dispositivo")]
+    subgraph app["Aplicación Android"]
+        screens["View · Pantallas y componentes Compose<br/>HomeScreen, GestionScreen, EventoDetalleScreen"]
+        vm["ViewModel · Coordina acciones y estado<br/>HomeViewModel, GestionViewModel, ScannerViewModel"]
+        domain["Dominio · Modelos, reglas y contratos<br/>Evento, Recinto, EventoRules, SyncPassOperations"]
+        repo["Repositorios · Implementan los contratos<br/>SyncPassRepository, ApiProyectosRepository, RoomRecintosRepository"]
+        remote["Fuente remota · Retrofit, OkHttp y DTO<br/>SyncPassApi, ApiClient, ApiModels"]
+        local["Fuente local · Room y DAO<br/>SyncPassDatabase, SyncPassDao, RecintoDao"]
+        worker["SyncWorker · Sincronización diferida"]
+        screens -->|"Envía acciones mediante callbacks"| vm
+        vm -->|"Publica estado observable"| screens
+        vm -->|"Usa los contratos de repositorio"| domain
+        repo -->|"Implementa los contratos y usa modelos del dominio"| domain
+        repo -->|"Consulta y envía datos"| remote
+        repo -->|"Lee y guarda caché, recintos y pendientes"| local
+        worker -->|"Pide procesar la cola"| repo
+    end
+    remote -->|"HTTPS mediante API Gateway"| backend
+    local -->|"Consultas y transacciones"| sqlite
+```
+
+`AppContainer` construye las dependencias por cuenta. En ejecución, cuando un ViewModel llama a un contrato de dominio, la operación se ejecuta en su repositorio concreto. Compose vuelve a dibujar la interfaz cuando cambia el estado observable.
+
+### Vista general del despliegue
 
 ```text
 Android: Compose -> ViewModel -> contrato de repositorio
