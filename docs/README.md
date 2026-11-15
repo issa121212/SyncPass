@@ -5,8 +5,8 @@ Documentación técnica y funcional de la entrega de SyncPass Android y su backe
 ## Lectura sugerida
 
 1. [Caso original](caso.md): contexto del negocio, restricciones y objetivos académicos.
-2. [Problema, alcance y requisitos](01-CASO-Y-REQUISITOS.md).
-3. [Arquitectura y modelo de datos](02-ARQUITECTURA.md).
+2. [Alcance, requisitos y casos de uso](ALCANCE.md).
+3. [Arquitectura C4 y modelo de datos](ARQUITECTURA.md).
 4. [Roles, dashboards y manual](03-ROLES-Y-USO.md).
 5. [API y seguridad](04-API-Y-SEGURIDAD.md).
 6. [Room, sincronización y experiencia de usuario](05-DATOS-Y-EXPERIENCIA.md).

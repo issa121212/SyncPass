@@ -50,9 +50,54 @@ La cancelación de una inscripción individual, reportes exportables y administr
 | RNF-09 | Consistencia de operaciones | Transacciones, UUID para asistencia, restricciones de cupos, confirmación remota al editar/eliminar |
 | RNF-10 | Portabilidad | Gradle Wrapper y ejemplos de entorno; requiere SDK/JDK, Cognito y servidor accesible |
 | RNF-11 | Disponibilidad | Servicio systemd en EC2; depende del laboratorio, instancia, base de datos y certificados; sin SLA |
-| RNF-12 | Verificabilidad | Pruebas unitarias, de interfaz e integración; cobertura porcentual no medida |
+| RNF-12 | Verificabilidad | Pruebas unitarias e instrumentadas. La variante debug de Android alcanza 44,01 % de cobertura combinada de líneas. Ver [reproducción del informe](08-VALIDACION-Y-GITFLOW.md#cobertura-android-con-jacoco). |
 | RNF-13 | Separación por cuenta | Room y repositorios ligados a issuer/sub; recintos no compartidos automáticamente |
 | RNF-14 | Compatibilidad | minSdk 24, target/compile 37; el caso pide Android 8/API 26 o superior, incluido en ese rango; no se ha validado cada versión |
+
+## Casos de uso y flujos
+
+### CU-01 · Iniciar sesión y abrir el inicio
+
+- **Actores:** docente, estudiante voluntario y participante. Se requiere una cuenta Cognito habilitada.
+- **Flujo:** la persona elige continuar con Cognito, se autentica en el navegador y retorna a Android. La app guarda la sesión y presenta las acciones según el perfil.
+- **Alternativa:** si se cancela el acceso, se mantiene la pantalla de inicio de sesión. Si expira la sesión, hay que autenticarse de nuevo.
+- **Trazabilidad:** RF-01, RF-02, RNF-01 a RNF-03.
+
+### CU-02 · Gestionar proyectos y eventos
+
+- **Actor:** docente responsable o administrador autorizado. Se requiere conexión y, para el evento, un proyecto permitido.
+- **Flujo:** el docente elige el proyecto, completa los pasos del formulario y guarda. La API valida los datos y permisos. Con la respuesta exitosa, Android actualiza su copia en Room.
+- **Alternativas:** se puede cancelar el evento y conservar su historial. El servidor rechaza la eliminación si hay historial incompatible. Si falla la red o la validación, se conserva la última versión confirmada en Room.
+- **Trazabilidad:** RF-03 a RF-08, RF-18, RNF-02 y RNF-09.
+
+### CU-03 · Gestionar recintos locales
+
+- **Actor:** docente desde la pantalla de gestión. Puede trabajar con los datos de su cuenta en el dispositivo sin conexión.
+- **Flujo:** abre la sección de recintos, completa los campos y guarda. Room actualiza la lista. Al elegir el recinto en el editor de eventos, se copian sus campos al formulario.
+- **Alternativas:** puede editar o eliminar un recinto local. La creación del evento asociado requiere conexión.
+- **Trazabilidad:** RF-09, RNF-06, RNF-13.
+
+### CU-04 · Inscribirse y presentar el QR
+
+- **Actor:** participante. El evento debe estar habilitado y contar con cupo.
+- **Flujo:** abre el evento, solicita la inscripción y muestra su credencial QR para recepción.
+- **Alternativa:** ante un error transitorio, Android puede guardar la solicitud en la cola local. El servidor verifica las condiciones de inscripción cuando recibe la solicitud.
+- **Trazabilidad:** RF-05, RF-10 y RF-11.
+
+### CU-05 · Registrar y sincronizar asistencia
+
+- **Actores:** participante y estudiante voluntario de recepción. También pueden escanear el docente responsable y el administrador según sus permisos.
+- **Flujo:** recepción abre el evento correcto y escanea el QR. Android guarda la captura con un UUID y envía el contenido leído a la API. El servidor valida el evento, los permisos y el registro de asistencia.
+- **Alternativa sin red:** la captura queda en Room. Al reconectar, el operador pulsa **Sincronizar** o espera al trabajo programado. El reintento conserva el UUID. Los rechazos definitivos se registran para consulta.
+- **Verificación:** comprobar que la captura se registre una sola vez y en el evento seleccionado.
+- **Trazabilidad:** RF-12, RF-13, RF-16, RF-17, RNF-06 y RNF-09.
+
+### CU-06 · Responder y consultar encuestas
+
+- **Actores:** participante con asistencia registrada y docente responsable o administrador para la consulta.
+- **Flujo:** el participante asigna valores de satisfacción y utilidad de 1 a 5 y puede agregar un comentario. El backend verifica la asistencia. El docente consulta las encuestas desde el evento que administra.
+- **Alternativa:** Android conserva el envío en su cola si todavía no puede sincronizarlo.
+- **Trazabilidad:** RF-14, RF-15, RF-17.
 
 ## Diferencias respecto a la visión del caso
 
