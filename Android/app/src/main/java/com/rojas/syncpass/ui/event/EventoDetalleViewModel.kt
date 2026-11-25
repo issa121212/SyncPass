@@ -1,7 +1,8 @@
 package com.rojas.syncpass.ui.event
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import com.rojas.syncpass.domain.model.Evento
 import com.rojas.syncpass.domain.model.*
@@ -55,10 +56,12 @@ data class EventoDetalleUiState(
         get() = rolesSet.any { it.equals("ESTUDIANTE", true) }
 }
 
-class EventoDetalleViewModel(
-    private val eventoId: Long,
+@HiltViewModel
+class EventoDetalleViewModel @Inject constructor(
+    savedStateHandle: androidx.lifecycle.SavedStateHandle,
     private val repository: SyncPassOperations,
 ) : ViewModel() {
+    private val eventoId: Long = requireNotNull(savedStateHandle.get<Long>("id"))
 
     private data class Extras(
         val asistentes: List<Asistente> = emptyList(),
@@ -178,16 +181,5 @@ class EventoDetalleViewModel(
 
     fun limpiarMensaje() {
         extras.update { it.copy(mensaje = null, error = null) }
-    }
-}
-
-class EventoDetalleViewModelFactory(
-    private val eventoId: Long,
-    private val repository: SyncPassOperations,
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(EventoDetalleViewModel::class.java))
-        return EventoDetalleViewModel(eventoId, repository) as T
     }
 }

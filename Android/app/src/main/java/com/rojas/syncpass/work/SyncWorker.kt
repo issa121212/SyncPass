@@ -9,7 +9,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.rojas.syncpass.SyncPassApplication
+import com.rojas.syncpass.data.session.SessionStore
+import com.rojas.syncpass.di.AccountDependencies
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.TimeUnit
 
 class SyncWorker(
@@ -18,13 +23,25 @@ class SyncWorker(
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
-        val app = applicationContext as? SyncPassApplication ?: return Result.success()
-        if (!app.container.sessionStore.hasValidSession()) return Result.success()
-        return app.container.repository.sincronizar().fold(
+        val dependencies = EntryPointAccessors.fromApplication(applicationContext, SyncWorkerDependencies::class.java)
+        if (!dependencies.sessionStore().hasValidSession()) return Result.success()
+        val repository = try {
+            dependencies.accounts().current()
+        } catch (_: IllegalStateException) {
+            return Result.success()
+        }
+        return repository.sincronizar().fold(
             onSuccess = { Result.success() },
             onFailure = { if ((it as? com.rojas.syncpass.domain.AppException)?.reintentable == true) Result.retry() else Result.failure() },
         )
     }
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface SyncWorkerDependencies {
+    fun sessionStore(): SessionStore
+    fun accounts(): AccountDependencies
 }
 
 object SyncScheduler {

@@ -1,5 +1,8 @@
 package com.rojas.syncpass.ui.gestion
 
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
 import androidx.lifecycle.*
 import com.rojas.syncpass.domain.model.*
 import com.rojas.syncpass.domain.model.ProyectoInput
@@ -7,7 +10,8 @@ import com.rojas.syncpass.domain.SyncPassOperations
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class GestionViewModel(private val repository: SyncPassOperations) : ViewModel() {
+@HiltViewModel
+class GestionViewModel @Inject constructor(private val repository: SyncPassOperations) : ViewModel() {
     data class Estado(val guardando: Boolean = false, val mensaje: String? = null, val error: Boolean = false)
     private val _estado = MutableStateFlow(Estado())
     val estado = _estado.asStateFlow()

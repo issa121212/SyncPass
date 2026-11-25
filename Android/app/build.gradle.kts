@@ -30,6 +30,7 @@ val cognitoLogout: String = envOr("COGNITO_LOGOUT_URI", cognitoRedirect)
 val cognitoScopes: String = envOr("COGNITO_SCOPES", "email openid phone")
 
 plugins {
+    alias(libs.plugins.hilt)
     jacoco
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -92,6 +93,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.viewmodel.compose)
+    ksp(libs.hilt.compiler)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

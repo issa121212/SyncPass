@@ -28,7 +28,8 @@ class LocalCrudUiTest {
                 throw AssertionError("El CRUD local no debe llamar a la API")
             } as SyncPassApi
             val repo = SyncPassRepository(api, db.dao(), SessionStore(context), db.recintoDao())
-            compose.setContent { SyncPassTheme { GestionScreen(repo, {}) } }
+            val viewModel = com.rojas.syncpass.ui.gestion.GestionViewModel(repo)
+            compose.setContent { SyncPassTheme { GestionScreen(viewModel, {}) } }
             compose.onNodeWithText("Recintos · Local").performClick()
             compose.onNodeWithText("Nuevo recinto").performClick()
             compose.onNodeWithText("Nombre *").performTextInput("Sede vecinal")

@@ -1,4 +1,6 @@
 plugins {
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
     id("com.android.library")
 }
 
@@ -21,6 +23,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
     implementation(libs.appauth)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.coroutines.core)

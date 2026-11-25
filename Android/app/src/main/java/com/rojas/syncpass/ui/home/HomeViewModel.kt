@@ -1,7 +1,8 @@
 package com.rojas.syncpass.ui.home
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import com.rojas.syncpass.domain.model.EventoInput
 import com.rojas.syncpass.domain.model.ProyectoInput
@@ -13,7 +14,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val repository: SyncPassOperations,
 ) : ViewModel() {
 
@@ -142,15 +144,5 @@ class HomeViewModel(
 
     fun limpiarMensaje() {
         estado.update { it.copy(mensaje = null, error = null) }
-    }
-}
-
-class HomeViewModelFactory(
-    private val repository: SyncPassOperations,
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(HomeViewModel::class.java))
-        return HomeViewModel(repository) as T
     }
 }
