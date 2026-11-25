@@ -24,7 +24,7 @@ class EventoAttendanceTest {
         events = mock(EventoRepository.class); attendances = mock(AsistenciaRepository.class);
         registrations = mock(InscripcionRepository.class); users = mock(UsuarioService.class);
         projects = mock(ProyectoService.class);
-        service = new EventoService(events, registrations, attendances, projects, users, mock(EncuestaService.class));
+        service = new EventoService(events, registrations, attendances, projects, users, mock(EncuestaService.class), new AttendanceLocationPolicy("AUDIT"));
         receiver = user(2L, "VOLUNTARIO"); participant = user(3L, "PARTICIPANTE");
         event = new Evento(); event.setId(7L); event.setEstado(EstadoEvento.PROGRAMADO); event.setCupos(20);
         var project = new Proyecto(); project.setResponsable(user(1L, "DOCENTE")); event.setProyecto(project);
@@ -36,7 +36,7 @@ class EventoAttendanceTest {
     Usuario user(Long id, String role) {
         var u = new Usuario(); u.setId(id); u.setRoles(Set.of(role)); u.setNombre("Nombre Cognito"); return u;
     }
-    AsistenciaRequest request(String qr) { return new AsistenciaRequest(qr, true, null, null, null, null, "uuid-1"); }
+    AsistenciaRequest request(String qr) { return new AsistenciaRequest(qr, true, null, null, null, null, "uuid-1", null); }
 
     @Test void volunteerCanScanParticipantWithoutOwningProject() {
         var result = service.escanear(7L, request("SYNC_PASS:ASISTENCIA:7:3"));

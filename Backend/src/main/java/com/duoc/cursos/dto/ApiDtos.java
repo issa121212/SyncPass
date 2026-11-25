@@ -129,7 +129,8 @@ public final class ApiDtos {
             @jakarta.validation.constraints.DecimalMin("-90.0") @jakarta.validation.constraints.DecimalMax("90.0") Double latitud,
             @jakarta.validation.constraints.DecimalMin("-180.0") @jakarta.validation.constraints.DecimalMax("180.0") Double longitud,
             @jakarta.validation.constraints.DecimalMin("0.0") @jakarta.validation.constraints.DecimalMax("100000.0") Double precisionMetros,
-            @Size(max = 64) String clientUuid
+            @Size(max = 64) String clientUuid,
+            Instant ubicacionEn
     ) {
     }
 
@@ -193,7 +194,8 @@ public final class ApiDtos {
             Instant marcadoEn,
             @jakarta.validation.constraints.DecimalMin("-90.0") @jakarta.validation.constraints.DecimalMax("90.0") Double latitud,
             @jakarta.validation.constraints.DecimalMin("-180.0") @jakarta.validation.constraints.DecimalMax("180.0") Double longitud,
-            @jakarta.validation.constraints.DecimalMin("0.0") @jakarta.validation.constraints.DecimalMax("100000.0") Double precisionMetros
+            @jakarta.validation.constraints.DecimalMin("0.0") @jakarta.validation.constraints.DecimalMax("100000.0") Double precisionMetros,
+            Instant ubicacionEn
     ) {
     }
 

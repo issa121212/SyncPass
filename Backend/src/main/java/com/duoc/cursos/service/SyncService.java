@@ -34,7 +34,8 @@ public class SyncService {
                         item.latitud(),
                         item.longitud(),
                         item.precisionMetros(),
-                        item.clientUuid()
+                        item.clientUuid(),
+                        item.ubicacionEn()
                 ));
                 procesados++;
             } catch (Exception ex) {

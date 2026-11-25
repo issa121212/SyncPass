@@ -44,6 +44,15 @@ public class Asistencia {
     @Column(name = "precision_metros")
     private Double precisionMetros;
 
+    @Column(name = "ubicacion_en")
+    private Instant ubicacionEn;
+
+    @Column(name = "validacion_geografica", length = 32)
+    private String validacionGeografica;
+
+    @Column(name = "motivo_geografico", length = 64)
+    private String motivoGeografico;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private OrigenAsistencia origen = OrigenAsistencia.QR;
