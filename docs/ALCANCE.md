@@ -102,7 +102,7 @@ La cancelación de una inscripción individual, reportes exportables y administr
 ## Diferencias respecto a la visión del caso
 
 - El caso menciona QR dinámico; el MVP usa identificadores QR legibles y no firmados. No hay caducidad criptográfica ni protección completa contra copia de credenciales.
-- La ubicación se captura como referencia. No se encontró una comprobación de distancia al recinto en `EventoService.escanear`; no afirmar que existe geocerca obligatoria.
+- La recepción incorpora comprobación de ubicación, precisión y distancia en Android y backend. El backend inicia en modo `AUDIT` compatible; la geocerca obligatoria requiere activar `ENFORCE` después de actualizar y verificar los clientes. Véase [la política geográfica](11-GEOLOCALIZACION-ASISTENCIA.md).
 - La cola no cubre todo el CRUD y el trabajo periódico no garantiza envío inmediato al volver la señal.
 - No se entrega un motor de informes institucionales ni una medición formal del impacto.
 - La paleta puede variar por los colores dinámicos de Android; la consistencia azul observada no es una garantía de color fijo en todos los equipos.

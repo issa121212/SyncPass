@@ -72,8 +72,9 @@ Muestra catálogo y acceso a eventos para recepción. Abrir el evento correcto a
 2. Pulsar Escanear QR de participante.
 3. Autorizar cámara si el sistema lo solicita.
 4. Enfocar el QR que muestra el participante.
-5. Leer el resultado: confirmado en servidor o captura pendiente.
-6. Revisar pendientes y rechazadas antes de considerar completo el registro.
+5. Si el evento tiene zona, permitir ubicación y permanecer dentro del radio. Si la posición es antigua, imprecisa o queda fuera, corregir la condición y pulsar Reintentar. Ajustar permisos abre la configuración de Android si se necesita habilitar ubicación precisa.
+6. Leer el resultado: confirmado en servidor, captura pendiente o rechazo con su motivo. Los eventos sin zona mantienen el flujo compatible.
+7. Revisar pendientes y rechazadas antes de considerar completo el registro. Véanse las reglas y el modo de transición del backend en [Validación geográfica](11-GEOLOCALIZACION-ASISTENCIA.md).
 
 Docente responsable y ADMIN también pueden utilizar recepción; no es una capacidad exclusiva del estudiante.
 

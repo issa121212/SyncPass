@@ -15,6 +15,7 @@ Documentación técnica y funcional de la entrega de SyncPass Android y su backe
 9. [Pruebas, limitaciones, Gitflow e IA](08-VALIDACION-Y-GITFLOW.md).
 10. [Migración a Hilt y dependencias por cuenta](09-INYECCION-HILT.md).
 11. [Selección de ubicación de eventos](10-UBICACION-EVENTOS.md).
+12. [Validación geográfica de asistencia y transición compatible](11-GEOLOCALIZACION-ASISTENCIA.md).
 
 ## Cómo interpretar el alcance
 
