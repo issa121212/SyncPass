@@ -119,6 +119,7 @@ data class AsistenciaRequest(
     val longitud: Double? = null,
     val precisionMetros: Double? = null,
     val clientUuid: String? = null,
+    val ubicacionEn: String? = null,
 )
 
 data class EncuestaRequest(
@@ -160,6 +161,7 @@ data class AsistenciaSyncItem(
     val latitud: Double? = null,
     val longitud: Double? = null,
     val precisionMetros: Double? = null,
+    val ubicacionEn: String? = null,
 )
 
 data class EncuestaSyncItem(

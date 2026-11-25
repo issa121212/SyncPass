@@ -58,6 +58,9 @@ interface SyncPassDao {
     @Query("SELECT COUNT(*) FROM pendientes WHERE clientUuid = :uuid AND sincronizado = 0")
     suspend fun contarPendiente(uuid: String): Int
 
+    @Query("SELECT * FROM pendientes WHERE clientUuid = :uuid")
+    suspend fun operacion(uuid: String): PendienteEntity?
+
     @Query("DELETE FROM proyectos WHERE id = :id")
     suspend fun eliminarProyecto(id: Long)
 

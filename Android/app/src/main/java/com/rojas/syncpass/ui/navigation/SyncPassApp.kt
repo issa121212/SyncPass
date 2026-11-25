@@ -1,24 +1,18 @@
 package com.rojas.syncpass.ui.navigation
 
-import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.rojas.syncpass.core.util.UbicacionHelper
 import com.rojas.syncpass.ui.event.EventoDetalleScreen
 import com.rojas.syncpass.ui.event.EventoDetalleViewModel
 import com.rojas.syncpass.ui.home.HomeScreen
 import com.rojas.syncpass.ui.home.HomeViewModel
-import com.rojas.syncpass.ui.scanner.QrScannerScreen
-import kotlinx.coroutines.launch
 
 private const val RUTA_HOME = "home"
 private const val RUTA_EVENTO = "evento/{id}"
@@ -78,22 +72,8 @@ fun SyncPassApp(
             arguments = listOf(navArgument("id") { type = NavType.LongType }),
         ) { entry ->
             val id = entry.arguments?.getLong("id") ?: return@composable
-            val context = LocalContext.current
             val scanner: com.rojas.syncpass.ui.scanner.ScannerViewModel = hiltViewModel()
-            val resultado by scanner.resultado.collectAsState()
-            androidx.compose.runtime.LaunchedEffect(resultado) {
-                resultado?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show(); navController.popBackStack() }
-            }
-            val ubicacionHelper = UbicacionHelper(context)
-
-            QrScannerScreen(
-                titulo = "Escanear participante",
-                onScanned = { codigo ->
-                    val ubicacion = ubicacionHelper.ultimaUbicacion()
-                    scanner.registrar(id, codigo, ubicacion?.latitud, ubicacion?.longitud, ubicacion?.precisionMetros)
-                },
-                onBack = { navController.popBackStack() },
-            )
+            com.rojas.syncpass.ui.scanner.AttendanceScannerScreen(scanner, onBack = { navController.popBackStack() })
         }
     }
 }

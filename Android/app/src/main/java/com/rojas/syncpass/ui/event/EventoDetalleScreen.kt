@@ -50,7 +50,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.rojas.syncpass.core.util.FechaUtils
-import com.rojas.syncpass.core.util.UbicacionHelper
 import com.rojas.syncpass.domain.model.Evento
 import com.rojas.syncpass.domain.model.Asistente
 import com.rojas.syncpass.domain.model.EncuestaEvento

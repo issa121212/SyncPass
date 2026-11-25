@@ -13,7 +13,7 @@ import androidx.room.RoomDatabase
         PendienteEntity::class,
         RecintoEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class SyncPassDatabase : RoomDatabase() {
@@ -22,6 +22,11 @@ abstract class SyncPassDatabase : RoomDatabase() {
     abstract fun recintoDao(): RecintoDao
 
     companion object {
+        val MIGRATION_3_4 = object : androidx.room.migration.Migration(3, 4) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE pendientes ADD COLUMN ubicacionEn TEXT")
+            }
+        }
         val MIGRATION_2_3 = object : androidx.room.migration.Migration(2, 3) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE pendientes ADD COLUMN rechazado INTEGER NOT NULL DEFAULT 0")
@@ -47,7 +52,7 @@ abstract class SyncPassDatabase : RoomDatabase() {
             return instances.getOrPut(suffix) {
                 Room.databaseBuilder(context.applicationContext,
                     SyncPassDatabase::class.java, "syncpass-$suffix.db")
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
             }
         }
     }
