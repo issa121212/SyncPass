@@ -40,6 +40,9 @@ fun EventoEditorDialog(
     var longitud by rememberSaveable { mutableStateOf(inicial?.longitud?.toString().orEmpty()) }
     var radio by rememberSaveable { mutableStateOf((inicial?.radioMetros ?: 200).toString()) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
+    var mostrarMapa by rememberSaveable { mutableStateOf(false) }
+    var mapaId by rememberSaveable { mutableStateOf("") }
+    var coordenadasAvanzadas by rememberSaveable { mutableStateOf(false) }
     val scroll = rememberScrollState()
     LaunchedEffect(paso) { scroll.scrollTo(0) }
 
@@ -100,7 +103,20 @@ fun EventoEditorDialog(
                         }
                         CampoEvento("Recinto (opcional)", recinto, { recinto = it }, !guardando)
                         CampoEvento("Dirección (opcional)", direccion, { direccion = it }, !guardando)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(enabled = !guardando, onClick = {
+                            mapaId = java.util.UUID.randomUUID().toString()
+                            mostrarMapa = true
+                        }) {
+                            Text(if (latitud.isBlank() && longitud.isBlank()) "Elegir zona en mapa" else "Revisar zona en mapa")
+                        }
+                        if (latitud.isNotBlank() && longitud.isNotBlank()) {
+                            Text("Zona seleccionada · Radio de $radio m", style = MaterialTheme.typography.bodyMedium)
+                            TextButton(enabled = !guardando, onClick = { latitud = ""; longitud = "" }) { Text("Quitar ubicación") }
+                        }
+                        TextButton(enabled = !guardando, onClick = { coordenadasAvanzadas = !coordenadasAvanzadas }) {
+                            Text(if (coordenadasAvanzadas) "Ocultar coordenadas avanzadas" else "Coordenadas avanzadas")
+                        }
+                        if (coordenadasAvanzadas) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Box(Modifier.weight(1f)) { CampoEvento("Latitud", latitud, { latitud = it }, !guardando, KeyboardType.Decimal) }
                             Box(Modifier.weight(1f)) { CampoEvento("Longitud", longitud, { longitud = it }, !guardando, KeyboardType.Decimal) }
                         }
@@ -135,6 +151,23 @@ fun EventoEditorDialog(
             if (paso > 0) TextButton(enabled = !guardando, onClick = { paso--; error = null }) { Text("Atrás") }
         },
     )
+    if (mostrarMapa) {
+        val lat = latitud.toDoubleOrNull()
+        val lon = longitud.toDoubleOrNull()
+        val point = if (lat != null && lon != null) GeoPoint(lat, lon).takeIf { runCatching { it.validate() }.isSuccess } else null
+        EventLocationDialog(
+            dialogId = mapaId,
+            initialPoint = point,
+            initialRadius = radio.toIntOrNull()?.takeIf { it in 1..50_000 } ?: 200,
+            onDismiss = { mostrarMapa = false },
+            onConfirm = { zone ->
+                latitud = zone.center.latitude.toString()
+                longitud = zone.center.longitude.toString()
+                radio = zone.radiusMeters.toString()
+                mostrarMapa = false
+            },
+        )
+    }
 }
 
 @Composable
