@@ -20,6 +20,12 @@ public class SyncController {
         this.syncService = syncService;
     }
 
+    @GetMapping("/capabilities")
+    @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
+    public java.util.Map<String, Boolean> capabilities() {
+        return java.util.Map.of("creacionIdempotente", true);
+    }
+
     @PostMapping("/asistencias")
     @PreAuthorize("hasAnyRole('DOCENTE','ADMIN','VOLUNTARIO')")
     public SyncResult asistencias(@jakarta.validation.constraints.Size(min = 1, max = 100) @RequestBody List<@Valid AsistenciaSyncItem> items) {

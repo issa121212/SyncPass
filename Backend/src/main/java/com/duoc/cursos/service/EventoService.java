@@ -33,6 +33,7 @@ public class EventoService {
     private final UsuarioService usuarioService;
     private final EncuestaService encuestaService;
     private final AttendanceLocationPolicy locationPolicy;
+    private final CreationIdempotency creations;
 
     public EventoService(
             EventoRepository eventoRepository,
@@ -41,7 +42,8 @@ public class EventoService {
             ProyectoService proyectoService,
             UsuarioService usuarioService,
             EncuestaService encuestaService,
-            AttendanceLocationPolicy locationPolicy
+            AttendanceLocationPolicy locationPolicy,
+            CreationIdempotency creations
     ) {
         this.eventoRepository = eventoRepository;
         this.inscripcionRepository = inscripcionRepository;
@@ -50,6 +52,7 @@ public class EventoService {
         this.usuarioService = usuarioService;
         this.encuestaService = encuestaService;
         this.locationPolicy = locationPolicy;
+        this.creations = creations;
     }
 
     @Transactional(readOnly = true)
@@ -69,16 +72,23 @@ public class EventoService {
 
     @Transactional
     public EventoResponse crear(EventoRequest request) {
-        Proyecto proyecto = proyectoService.requireParaModificar(request.proyectoId());
-        proyectoService.requireOwnerOrAdmin(proyecto);
-
-        Evento evento = new Evento();
-        evento.setProyecto(proyecto);
-        aplicar(evento, request);
-        evento = eventoRepository.save(evento);
-        evento.setQrContenido("EVENTO_" + evento.getId());
-        evento = eventoRepository.save(evento);
-        return toResponse(evento, usuarioService.getCurrentUsuario());
+        Usuario actual = usuarioService.getCurrentUsuario();
+        String hash = CreationIdempotency.fingerprint(request.proyectoId(), request.nombre(), request.descripcion(),
+            request.fechaHora(), request.cupos(), request.recinto(), request.direccion(), request.latitud(),
+            request.longitud(), request.radioMetros(), request.estado());
+        Long id = creations.resolve(actual.getId(), "EVENTO", request.clientUuid(), hash, () -> {
+            Proyecto proyecto = proyectoService.requireParaModificar(request.proyectoId());
+            proyectoService.requireOwnerOrAdmin(proyecto);
+            Evento evento = new Evento();
+            evento.setProyecto(proyecto);
+            aplicar(evento, request);
+            evento = eventoRepository.save(evento);
+            evento.setQrContenido("EVENTO_" + evento.getId());
+            return eventoRepository.save(evento).getId();
+        });
+        Evento result = require(id);
+        proyectoService.requireOwnerOrAdmin(result.getProyecto());
+        return toResponse(result, actual);
     }
 
     @Transactional

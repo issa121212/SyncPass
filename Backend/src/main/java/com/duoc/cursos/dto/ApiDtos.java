@@ -49,7 +49,8 @@ public final class ApiDtos {
             @Size(max = 160) String unidadVecinal,
             LocalDate fechaInicio,
             LocalDate fechaFin,
-            EstadoProyecto estado
+            EstadoProyecto estado,
+            @Size(max = 64) String clientUuid
     ) {
     }
 
@@ -79,7 +80,8 @@ public final class ApiDtos {
             @jakarta.validation.constraints.DecimalMin("-90.0") @jakarta.validation.constraints.DecimalMax("90.0") Double latitud,
             @jakarta.validation.constraints.DecimalMin("-180.0") @jakarta.validation.constraints.DecimalMax("180.0") Double longitud,
             @Min(1) @Max(50000) Integer radioMetros,
-            EstadoEvento estado
+            EstadoEvento estado,
+            @Size(max = 64) String clientUuid
     ) {
     }
 
