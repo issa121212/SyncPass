@@ -30,3 +30,13 @@ El usuario confirmó que el evento pendiente del teléfono se sincronizó despu�
 ## Recuperación
 
 El respaldo anterior se conserva en EC2. Ante un fallo se debe revisar el servicio y las migraciones antes de sustituir el JAR. No se restaura automáticamente la base, ya que eso podría perder nuevas escrituras posteriores al despliegue. Las migraciones aplicadas son aditivas; no se eliminan tablas ni filas de negocio para revertir la aplicación.
+
+## Activación posterior de ENFORCE
+
+El 26-11-2026, después de comprobar la sincronización del teléfono y el catálogo web, el usuario solicitó activar la validación obligatoria. Se respaldó la configuración previa en `/etc/syncpass/backend.env.before-enforce-20261126` con permisos privados, se cambió `ATTENDANCE_GEO_MODE=ENFORCE` y se reinició únicamente syncpass. No se modificaron datos, JAR, migraciones, Nginx ni API Gateway en este cambio.
+
+Se verificó la variable ENFORCE en el entorno del proceso Java en ejecución, el servicio activo y la respuesta de salud `UP`. Las referencias a AUDIT anteriores describen el despliegue inicial; el modo activo posterior es ENFORCE.
+
+Para eventos con zona, tanto el registro directo como la sincronización rechazan evidencia ausente, inválida, antigua, imprecisa o fuera del área con HTTP 422. El círculo de incertidumbre GPS debe quedar dentro del radio. Los eventos sin zona conservan el comportamiento anterior. Un cliente anterior que no envíe toda la evidencia requerida no podrá registrar asistencia en eventos con zona; no se considera comprobada la compatibilidad de ese flujo desde la web por el hecho de poder consultar eventos.
+
+La prueba física de rechazo fuera de radio y aceptación dentro sigue pendiente. La activación y la salud del servicio no sustituyen esa prueba. Para volver al modo de auditoría se debe cambiar solo ATTENDANCE_GEO_MODE a AUDIT y reiniciar el servicio, conservando las demás configuraciones vigentes.
