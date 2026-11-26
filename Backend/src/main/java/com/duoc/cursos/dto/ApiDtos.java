@@ -65,7 +65,8 @@ public final class ApiDtos {
             EstadoProyecto estado,
             UsuarioResumen responsable,
             Instant creadoEn,
-            Instant actualizadoEn
+            Instant actualizadoEn,
+            String codigoPublico
     ) {
     }
 
@@ -106,7 +107,8 @@ public final class ApiDtos {
             Instant actualizadoEn,
             Boolean inscrito,
             Boolean esPresente,
-            Boolean encuestaRespondida
+            Boolean encuestaRespondida,
+            String codigoPublico
     ) {
     }
 

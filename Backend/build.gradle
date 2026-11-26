@@ -73,3 +73,10 @@ tasks.register('androidRehearsalServer', JavaExec) {
     mainClass = 'com.duoc.cursos.rehearsal.AndroidRehearsalServer'
     jvmArgs '-Xmx256m'
 }
+
+tasks.register('publicCodesRehearsal', JavaExec) {
+    group = 'verification'
+    description = 'Verifica V5 y unicidad sobre la copia PostgreSQL local aislada.'
+    classpath = sourceSets.migrationRehearsal.runtimeClasspath
+    mainClass = 'com.duoc.cursos.rehearsal.PublicCodesRehearsal'
+}

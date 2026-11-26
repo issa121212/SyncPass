@@ -21,10 +21,12 @@ public class ProyectoService {
     private final ProyectoRepository proyectoRepository;
     private final UsuarioService usuarioService;
     private final CreationIdempotency creations;
+    private final PublicCodeAllocator publicCodes;
     private final com.duoc.cursos.repository.EventoRepository eventoRepository;
 
-    public ProyectoService(ProyectoRepository proyectoRepository, UsuarioService usuarioService, com.duoc.cursos.repository.EventoRepository eventoRepository, CreationIdempotency creations) {
+    public ProyectoService(ProyectoRepository proyectoRepository, UsuarioService usuarioService, com.duoc.cursos.repository.EventoRepository eventoRepository, CreationIdempotency creations, PublicCodeAllocator publicCodes) {
         this.creations = creations;
+        this.publicCodes = publicCodes;
         this.proyectoRepository = proyectoRepository;
         this.usuarioService = usuarioService;
         this.eventoRepository = eventoRepository;
@@ -51,6 +53,7 @@ public class ProyectoService {
             Proyecto proyecto = new Proyecto();
             aplicar(proyecto, request);
             proyecto.setResponsable(actual);
+            proyecto.setCodigoPublico(publicCodes.allocate("PRY"));
             if (proyecto.getEstado() == null) proyecto.setEstado(EstadoProyecto.PLANIFICADO);
             return proyectoRepository.save(proyecto).getId();
         });
@@ -110,7 +113,8 @@ public class ProyectoService {
                 proyecto.getEstado(),
                 responsable == null ? null : new UsuarioResumen(responsable.getId(), usuarioService.nombreVisible(responsable), usuarioService.emailVisible(responsable)),
                 proyecto.getCreadoEn(),
-                proyecto.getActualizadoEn()
+                proyecto.getActualizadoEn(),
+                proyecto.getCodigoPublico()
         );
     }
 
