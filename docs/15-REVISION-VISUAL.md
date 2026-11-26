@@ -35,3 +35,5 @@ Se ajustó `QrScannerScreen.kt` para distinguir una solicitud rechazada sin posi
 La vista previa y la concesión desde ajustes requieren una comprobación manual posterior a esta corrección. No se cambian permisos mediante comandos ni se registra asistencia para probar este comportamiento.
 
 Validación de la corrección: compilación e instalación del APK principal correctas, 91 pruebas unitarias aprobadas sin fallos y lint completado sin errores. Estas pruebas no sustituyen la comprobación manual del permiso del sistema y la vista previa.
+
+Comprobación visual posterior: con la sesión docente se abrió el lector desde un evento programado. La pantalla mostró el aviso de permiso bloqueado y el botón «Abrir ajustes», confirmando que ya no ofrece repetir una solicitud que Android descarta. El permiso seguía denegado; la vista previa continúa pendiente de concesión manual.
