@@ -71,6 +71,6 @@ La utilidad admite el modo `SYNCPASS_MIGRATION_REHEARSAL=YES_LOCAL_PRODUCTION_CO
 
 Se corrigió una comprobación inicial del ensayo que invocaba `validate()` antes de migrar y trataba V3/V4 pendientes como error. Ahora `migrate()` valida primero las migraciones aplicadas, admite las pendientes y luego se ejecuta `validate()` sobre V4. No se usó `repair`, no se ignoraron checksums ni se modificaron migraciones aplicadas.
 
-Antes del despliegue real siguen pendientes las pruebas de flujos autenticados, Android/Room y compatibilidad de clientes. El ensayo no activa ENFORCE ni demuestra todavía el comportamiento concurrente de la API de creación.
+La [integración Android posterior](14-INTEGRACION-ANDROID.md) comprobó Room, creación concurrente y geografía ENFORCE sobre esta copia con identidades ficticias firmadas. Antes del despliegue real siguen pendientes Cognito real, hardware/UI y compatibilidad de clientes en el despliegue compartido. ENFORCE se activó exclusivamente en el servidor local de ensayo; producción no cambió.
 
 La recuperación debe mantener juntos el dump, el JAR, la configuración y las operaciones idempotentes. Restaurar una base antigua sobre una aplicación que siguió aceptando escrituras puede perder esas escrituras; debe planificarse una ventana y la reconciliación, no sobrescribir producción automáticamente.
