@@ -23,9 +23,9 @@ El procedimiento ejecutado se conserva en `Backend/deploy/ec2/deploy-offline-upd
 
 API Gateway no publica `/actuator/health`: esa comprobación se ejecutó dentro de EC2. Un 404 del gateway para esa ruta no significa que el servicio esté caído.
 
-## Comprobación posterior pendiente
+## Comprobación posterior de sincronización
 
-La creación guardada en el teléfono permanece en su cola local hasta sincronizar con la sesión correspondiente. Falta confirmar desde el teléfono que se envía y desaparece el estado pendiente, y consultar el evento desde la web. Los controles sin credenciales no sustituyen esta comprobación autenticada.
+El usuario confirmó que el evento pendiente del teléfono se sincronizó después de actualizar EC2. Una consulta de solo lectura verificó una operación de tipo EVENTO en creaciones_operaciones, vinculada a un evento existente; el catálogo pasó de 8 a 9 eventos. Esto confirma la persistencia de una creación en el servidor sin una segunda operación registrada. No se consultaron ni imprimieron coordenadas personales. Falta la comprobación visual de ese evento desde la web y la prueba completa de asistencia con cámara física. Esta comprobación no constituye una nueva prueba de reintentos concurrentes; esos escenarios se verificaron en el entorno aislado del documento 14.
 
 ## Recuperación
 
