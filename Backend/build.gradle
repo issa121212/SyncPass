@@ -80,3 +80,10 @@ tasks.register('publicCodesRehearsal', JavaExec) {
     classpath = sourceSets.migrationRehearsal.runtimeClasspath
     mainClass = 'com.duoc.cursos.rehearsal.PublicCodesRehearsal'
 }
+
+tasks.register('publicCodeCompatibilityRehearsal', JavaExec) {
+    group = 'verification'
+    description = 'Ensaya defaults para INSERT de versiones anteriores sobre la copia local.'
+    classpath = sourceSets.migrationRehearsal.runtimeClasspath
+    mainClass = 'com.duoc.cursos.rehearsal.PublicCodeCompatibilityRehearsal'
+}

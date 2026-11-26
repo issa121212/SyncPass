@@ -17,7 +17,7 @@ public final class PublicCodesRehearsal {
         String password = Objects.requireNonNull(System.getenv("SYNCPASS_REHEARSAL_PASSWORD"));
         if (password.length() < 24) throw new IllegalStateException("Se requiere contraseña local privada");
         var flyway = Flyway.configure().dataSource(URL, "rehearsal", password)
-            .locations("filesystem:src/main/resources/db/migration").load();
+            .locations("filesystem:src/main/resources/db/migration").target("5").load();
         check("4".equals(flyway.info().current().getVersion().toString()), "El ensayo debe partir de V4");
         Map<String, List<String>> original;
         try (var c = DriverManager.getConnection(URL, "rehearsal", password)) { original = snapshot(c); }
