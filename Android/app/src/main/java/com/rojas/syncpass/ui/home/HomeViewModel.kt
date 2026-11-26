@@ -1,5 +1,6 @@
 package com.rojas.syncpass.ui.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: SyncPassOperations,
+    private val savedState: SavedStateHandle = SavedStateHandle(),
 ) : ViewModel() {
 
     private data class Estado(
@@ -42,12 +44,21 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    val uiState = combine(datos, estado, repository.recintos, repository.rechazadas) { base, est, recintos, rechazadas ->
-        base.copy(cargando = est.cargando, creando = est.creando, mensaje = est.mensaje, error = est.error, recintos = recintos, rechazadas = rechazadas)
+    private val filtro = savedState.getStateFlow("filtroEstadoEvento", FiltroEstadoEvento.TODOS.name)
+
+    val uiState = combine(datos, estado, repository.recintos, repository.rechazadas, filtro) { base, est, recintos, rechazadas, seleccion ->
+        val elegido = FiltroEstadoEvento.entries.firstOrNull { it.name == seleccion } ?: FiltroEstadoEvento.TODOS
+        base.copy(cargando = est.cargando, creando = est.creando, mensaje = est.mensaje, error = est.error,
+            recintos = recintos, rechazadas = rechazadas, filtroEstado = elegido,
+            eventosVisibles = elegido.aplicar(base.eventos))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
     init {
         refrescar()
+    }
+
+    fun filtrarEstado(filtro: FiltroEstadoEvento) {
+        savedState["filtroEstadoEvento"] = filtro.name
     }
 
     fun refrescar() {

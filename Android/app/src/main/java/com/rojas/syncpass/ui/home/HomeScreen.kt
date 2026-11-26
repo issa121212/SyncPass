@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -71,6 +75,7 @@ fun HomeScreen(
     ) -> Unit,
     onLimpiarMensaje: () -> Unit,
     onAdministrar: () -> Unit = {},
+    onFiltrarEstado: (FiltroEstadoEvento) -> Unit = {},
 ) {
     val snackbar = remember { SnackbarHostState() }
     var mostrarProyecto by remember { mutableStateOf(false) }
@@ -145,22 +150,28 @@ fun HomeScreen(
                 }
             }
             item {
-                Text("Eventos y talleres", style = MaterialTheme.typography.titleLarge)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Eventos y talleres", style = MaterialTheme.typography.titleLarge)
+                    FiltroEventos(state.filtroEstado, onFiltrarEstado)
+                    Text("${state.eventosVisibles.size} ${if (state.eventosVisibles.size == 1) "evento" else "eventos"}",
+                        style = MaterialTheme.typography.bodySmall)
+                }
             }
 
-            if (state.eventos.isEmpty()) {
+            if (state.eventosVisibles.isEmpty()) {
                 item {
                     Text(
-                        "No hay eventos guardados. Actualiza cuando tengas conexión.",
+                        if (state.eventos.isEmpty()) "No hay eventos guardados. Actualiza cuando tengas conexión."
+                        else "No hay eventos con estado ${state.filtroEstado.etiqueta.lowercase()}.",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             } else {
                 items(
-                    count = state.eventos.size,
-                    key = { index -> "evento_${state.eventos[index].id}" },
+                    count = state.eventosVisibles.size,
+                    key = { index -> "evento_${state.eventosVisibles[index].id}" },
                 ) { index ->
-                    val evento = state.eventos[index]
+                    val evento = state.eventosVisibles[index]
                     EventoCard(evento = evento, esDocente = state.esDocente, onClick = {
                         onEventClick(evento.id)
                     })
@@ -341,5 +352,23 @@ private fun Etiqueta(texto: String) {
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             style = MaterialTheme.typography.labelSmall,
         )
+    }
+}
+
+@Composable
+private fun FiltroEventos(seleccion: FiltroEstadoEvento, onSeleccionar: (FiltroEstadoEvento) -> Unit) {
+    var abierto by rememberSaveable { mutableStateOf(false) }
+    Box(Modifier.fillMaxWidth()) {
+        OutlinedButton(onClick = { abierto = true }, modifier = Modifier.fillMaxWidth()) {
+            Text("Estado: ${seleccion.etiqueta} ▾")
+        }
+        DropdownMenu(expanded = abierto, onDismissRequest = { abierto = false }) {
+            FiltroEstadoEvento.entries.forEach { opcion ->
+                DropdownMenuItem(text = { Text(opcion.etiqueta) }, onClick = {
+                    abierto = false
+                    onSeleccionar(opcion)
+                })
+            }
+        }
     }
 }
