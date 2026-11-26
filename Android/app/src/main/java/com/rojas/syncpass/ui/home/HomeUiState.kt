@@ -8,6 +8,8 @@ data class HomeUiState(
     val perfil: Perfil? = null,
     val proyectos: List<Proyecto> = emptyList(),
     val eventos: List<Evento> = emptyList(),
+    val filtroEstado: FiltroEstadoEvento = FiltroEstadoEvento.TODOS,
+    val eventosVisibles: List<Evento> = eventos,
     val pendientes: Int = 0,
     val recintos: List<com.rojas.syncpass.domain.model.Recinto> = emptyList(),
     val rechazadas: List<com.rojas.syncpass.domain.OperacionRechazada> = emptyList(),

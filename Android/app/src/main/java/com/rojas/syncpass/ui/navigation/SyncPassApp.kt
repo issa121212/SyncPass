@@ -30,6 +30,7 @@ fun SyncPassApp(
             val state by vm.uiState.collectAsState()
             HomeScreen(
                 state = state,
+                onFiltrarEstado = vm::filtrarEstado,
                 onRefresh = vm::refrescar,
                 onSync = vm::sincronizar,
                 onEventClick = { id -> navController.navigate("evento/$id") },
