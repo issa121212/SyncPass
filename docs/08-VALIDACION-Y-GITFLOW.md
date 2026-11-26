@@ -6,6 +6,8 @@ La suite unitaria final de Android registra 88 pruebas aprobadas. El reporte exc
 
 La app y el APK de pruebas compilan; lint registra cero errores. Los resultados detallados, comandos y pendientes están en [Creación offline](12-CREACION-OFFLINE.md). Las features locales dependen en orden de Hilt, ubicación, geolocalización de asistencia y creación offline; su integración hacia `develop` y posterior release hacia `main` requiere revisión. No se han publicado estas ramas ni desplegado el backend en esta etapa.
 
+Posteriormente se ejecutaron [seis pruebas instrumentadas y un escenario de actualización de APK en dos fases](14-INTEGRACION-ANDROID.md) sobre Room real y el backend local. Aprobaron sin omisiones; no se mezcló esa evidencia con la cobertura unitaria. La prueba local utilizó identidad ficticia firmada y una copia de PostgreSQL, no el login real de Cognito ni producción.
+
 ## Evidencia disponible
 
 Para preparar Android 1.7.0 (versionCode 10) se ejecutaron testDebugUnitTest, lintDebug, assembleDebug y assembleRelease con resultado correcto: 31 pruebas unitarias, sin fallos ni omisiones. Lint conserva advertencias existentes. Se generó una APK debug firmada con la clave de desarrollo y un artefacto release sin firma de distribución; este último debe firmarse antes de instalarlo como release. Las seis pruebas instrumentadas indicadas más abajo corresponden a la validación anterior del CRUD, no a una repetición durante esta preparación.

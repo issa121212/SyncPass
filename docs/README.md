@@ -18,6 +18,7 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 12. [Validación geográfica de asistencia y transición compatible](11-GEOLOCALIZACION-ASISTENCIA.md).
 13. [Creación offline, dependencias e idempotencia](12-CREACION-OFFLINE.md).
 14. [Respaldo y ensayo de migraciones](13-ENSAYO-MIGRACIONES.md).
+15. [Integración Android, Room y backend local](14-INTEGRACION-ANDROID.md).
 
 ## Cómo interpretar el alcance
 
