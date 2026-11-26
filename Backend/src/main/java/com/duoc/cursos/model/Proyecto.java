@@ -21,6 +21,9 @@ public class Proyecto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "codigo_publico", nullable = false, unique = true, length = 16, updatable = false)
+    private String codigoPublico;
+
     @Column(nullable = false, length = 160)
     private String nombre;
 

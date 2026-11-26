@@ -24,7 +24,7 @@ class EventoAttendanceTest {
         events = mock(EventoRepository.class); attendances = mock(AsistenciaRepository.class);
         registrations = mock(InscripcionRepository.class); users = mock(UsuarioService.class);
         projects = mock(ProyectoService.class);
-        service = new EventoService(events, registrations, attendances, projects, users, mock(EncuestaService.class), new AttendanceLocationPolicy("AUDIT"), mock(CreationIdempotency.class));
+        service = new EventoService(events, registrations, attendances, projects, users, mock(EncuestaService.class), new AttendanceLocationPolicy("AUDIT"), mock(CreationIdempotency.class), mock(PublicCodeAllocator.class));
         receiver = user(2L, "VOLUNTARIO"); participant = user(3L, "PARTICIPANTE");
         event = new Evento(); event.setId(7L); event.setEstado(EstadoEvento.PROGRAMADO); event.setCupos(20);
         var project = new Proyecto(); project.setResponsable(user(1L, "DOCENTE")); event.setProyecto(project);

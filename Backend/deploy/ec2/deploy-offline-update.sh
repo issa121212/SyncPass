@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
-# Despliegue explícito de V3/V4; conserva respaldo privado y compara datos previos.
+# Procedimiento histórico V2 -> V4. No reutilizar para V5 ni otras entregas.
 set -euo pipefail
 umask 077
 [[ "$EUID" -eq 0 ]] || exit 1
+current_version=$(runuser -u postgres -- psql -X -v ON_ERROR_STOP=1 -d syncpass -At -c 'SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank DESC LIMIT 1')
+if [[ "$current_version" != 2 ]]; then
+  echo 'Este procedimiento solo admite V2 -> V4. Preparar un despliegue específico para el esquema actual.' >&2
+  exit 1
+fi
 candidate=/home/ec2-user/syncpass-candidate-20261126.jar
 [[ -s "$candidate" ]] || exit 1
 snapshot() {
@@ -18,11 +23,7 @@ bash /home/ec2-user/syncpass-backup-20261126.sh
 backup=$(find /var/backups/syncpass -maxdepth 1 -type d -name 'pre-migrations-*' | sort | tail -1)
 [[ -f "$backup/database.dump" && -f "$backup/backend.jar" ]] || exit 1
 snapshot > "$backup/business-before.txt"
-if grep -q '^ATTENDANCE_GEO_MODE=' /etc/syncpass/backend.env; then
-  sed -i 's/^ATTENDANCE_GEO_MODE=.*/ATTENDANCE_GEO_MODE=AUDIT/' /etc/syncpass/backend.env
-else
-  printf '\nATTENDANCE_GEO_MODE=AUDIT\n' >> /etc/syncpass/backend.env
-fi
+# Conserva el modo geográfico elegido; el valor por defecto de la app es AUDIT.
 install -o root -g root -m 0644 "$candidate" /opt/syncpass/backend.jar.next
 mv /opt/syncpass/backend.jar.next /opt/syncpass/backend.jar
 systemctl start syncpass

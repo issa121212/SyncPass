@@ -168,6 +168,7 @@ fun EventoDetalleScreen(
             Text(evento.estado.replace('_', ' '), style = MaterialTheme.typography.labelMedium)
             Text(evento.proyectoNombre, style = MaterialTheme.typography.labelLarge)
             Text(evento.nombre, style = MaterialTheme.typography.headlineSmall)
+            com.rojas.syncpass.ui.components.CodigoPublicoLabel(evento.codigoPublico, evento.syncState)
             Text(FechaUtils.mostrar(evento.fechaHora), style = MaterialTheme.typography.bodyLarge)
             val lugar = listOfNotNull(evento.recinto, evento.direccion).joinToString(" · ")
             if (lugar.isNotBlank()) Text(lugar, style = MaterialTheme.typography.bodyMedium)

@@ -15,7 +15,7 @@ class RecintoRoomTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val name = "crud-test-${UUID.randomUUID()}.db"
         fun open() = Room.databaseBuilder(context, SyncPassDatabase::class.java, name)
-            .addMigrations(SyncPassDatabase.MIGRATION_1_2, SyncPassDatabase.MIGRATION_2_3, SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5).build()
+            .addMigrations(SyncPassDatabase.MIGRATION_1_2, SyncPassDatabase.MIGRATION_2_3, SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5, SyncPassDatabase.MIGRATION_5_6).build()
         var db = open()
         try {
             val id = db.recintoDao().crear(RecintoEntity(nombre = "Sede", direccion = "Calle 100"))
@@ -37,7 +37,7 @@ class RecintoRoomTest {
         createLegacyRoomFixture(context, name, 1)
         val db = Room.databaseBuilder(context, SyncPassDatabase::class.java, name)
             .addMigrations(SyncPassDatabase.MIGRATION_1_2, SyncPassDatabase.MIGRATION_2_3,
-                SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5).build()
+                SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5, SyncPassDatabase.MIGRATION_5_6).build()
         try {
             assertEquals("Proyecto anterior", db.dao().observarProyectos().first().single().nombre)
             assertEquals("Ana", db.dao().observarPerfil().first()?.nombre)

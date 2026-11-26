@@ -14,6 +14,7 @@ data class Proyecto(
     val responsableId: Long? = null,
     val syncState: String = "CONFIRMADO",
     val syncError: String? = null,
+    val codigoPublico: String? = null,
 )
 
 data class Evento(
@@ -39,6 +40,7 @@ data class Evento(
     val actualizadoEn: String?,
     val syncState: String = "CONFIRMADO",
     val syncError: String? = null,
+    val codigoPublico: String? = null,
 )
 
 data class Perfil(

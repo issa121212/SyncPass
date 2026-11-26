@@ -14,7 +14,7 @@ import androidx.room.RoomDatabase
         RecintoEntity::class,
         CreationEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 abstract class SyncPassDatabase : RoomDatabase() {
@@ -23,6 +23,12 @@ abstract class SyncPassDatabase : RoomDatabase() {
     abstract fun recintoDao(): RecintoDao
 
     companion object {
+        val MIGRATION_5_6 = object : androidx.room.migration.Migration(5, 6) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE proyectos ADD COLUMN codigoPublico TEXT")
+                db.execSQL("ALTER TABLE eventos ADD COLUMN codigoPublico TEXT")
+            }
+        }
         val MIGRATION_4_5 = object : androidx.room.migration.Migration(4, 5) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 for (table in listOf("proyectos", "eventos")) {
@@ -66,7 +72,7 @@ abstract class SyncPassDatabase : RoomDatabase() {
             return instances.getOrPut(suffix) {
                 Room.databaseBuilder(context.applicationContext,
                     SyncPassDatabase::class.java, "syncpass-$suffix.db")
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build()
             }
         }
     }

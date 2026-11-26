@@ -72,6 +72,8 @@ class OfflineBackendIntegrationTest {
         val requests = db.dao().creacionesPendientes().associate { it.tipo to it.clientUuid }
         assertEquals(2, db.dao().observarPendientes().first())
         assertEquals("PENDIENTE", localEvent.syncState)
+        assertNull(localProject.codigoPublico)
+        assertNull(localEvent.codigoPublico)
         db.close(); reopen(api)
         assertEquals("2026-11-25T14:30:15", db.dao().eventoLocal(localEvent.id)?.fechaHora)
         assertEquals(requests, db.dao().creacionesPendientes().associate { it.tipo to it.clientUuid })
@@ -93,6 +95,10 @@ class OfflineBackendIntegrationTest {
         assertEquals(1, projects.size); assertEquals(1, events.size)
         assertEquals(projects.single().id, events.single().proyectoId)
         assertEquals(200, events.single().radioMetros)
+        assertTrue(requireNotNull(projects.single().codigoPublico).matches(Regex("PRY-[0-9A-F]{12}")))
+        assertTrue(requireNotNull(events.single().codigoPublico).matches(Regex("EVT-[0-9A-F]{12}")))
+        assertEquals(projects.single().codigoPublico, db.dao().proyectoLocal(projects.single().id)?.codigoPublico)
+        assertEquals(events.single().codigoPublico, db.dao().eventoLocal(events.single().id)?.codigoPublico)
         assertNull(db.dao().proyectoLocal(localProject.id))
         assertNull(db.dao().eventoLocal(localEvent.id))
         assertEquals("CONFIRMADO", db.dao().eventoLocal(events.single().id)?.syncState)
@@ -105,6 +111,8 @@ class OfflineBackendIntegrationTest {
         val request = ProyectoRequest("Concurrencia ${UUID.randomUUID()}", clientUuid = UUID.randomUUID().toString())
         val responses = coroutineScope { List(2) { async(Dispatchers.IO) { api.crearProyecto(request) } }.awaitAll() }
         assertEquals(responses.first().id, responses.last().id)
+        assertNotNull(responses.first().codigoPublico)
+        assertEquals(responses.first().codigoPublico, responses.last().codigoPublico)
         assertEquals(1, api.proyectos().count { it.nombre == request.nombre })
         try { api.crearProyecto(request.copy(nombre = "Otro cuerpo")); fail("El mismo UUID no admite otros datos") }
         catch (error: HttpException) { assertEquals(409, error.code()) }

@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.rojas.syncpass.core.util.FechaUtils
 import com.rojas.syncpass.domain.model.Evento
 import com.rojas.syncpass.domain.model.Proyecto
+import com.rojas.syncpass.ui.components.CodigoPublicoLabel
 import com.rojas.syncpass.ui.components.QrDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -280,6 +281,7 @@ private fun EventoCard(evento: Evento, esDocente: Boolean, onClick: () -> Unit) 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(evento.nombre, style = MaterialTheme.typography.titleMedium)
                     Text(evento.proyectoNombre, style = MaterialTheme.typography.bodySmall)
+                    CodigoPublicoLabel(evento.codigoPublico, evento.syncState)
                 }
                 EstadoChip(evento.estado)
             }
@@ -316,6 +318,7 @@ private fun ProyectoCard(proyecto: Proyecto) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(proyecto.nombre, style = MaterialTheme.typography.titleMedium)
+            CodigoPublicoLabel(proyecto.codigoPublico, proyecto.syncState)
             proyecto.areaTematica?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             proyecto.unidadVecinal?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             if (!proyecto.responsableNombre.isNullOrBlank()) {

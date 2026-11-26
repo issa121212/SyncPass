@@ -34,6 +34,7 @@ public class EventoService {
     private final EncuestaService encuestaService;
     private final AttendanceLocationPolicy locationPolicy;
     private final CreationIdempotency creations;
+    private final PublicCodeAllocator publicCodes;
 
     public EventoService(
             EventoRepository eventoRepository,
@@ -43,7 +44,8 @@ public class EventoService {
             UsuarioService usuarioService,
             EncuestaService encuestaService,
             AttendanceLocationPolicy locationPolicy,
-            CreationIdempotency creations
+            CreationIdempotency creations,
+            PublicCodeAllocator publicCodes
     ) {
         this.eventoRepository = eventoRepository;
         this.inscripcionRepository = inscripcionRepository;
@@ -53,6 +55,7 @@ public class EventoService {
         this.encuestaService = encuestaService;
         this.locationPolicy = locationPolicy;
         this.creations = creations;
+        this.publicCodes = publicCodes;
     }
 
     @Transactional(readOnly = true)
@@ -82,6 +85,7 @@ public class EventoService {
             Evento evento = new Evento();
             evento.setProyecto(proyecto);
             aplicar(evento, request);
+            evento.setCodigoPublico(publicCodes.allocate("EVT"));
             evento = eventoRepository.save(evento);
             evento.setQrContenido("EVENTO_" + evento.getId());
             return eventoRepository.save(evento).getId();
@@ -307,7 +311,8 @@ public class EventoService {
                 evento.getActualizadoEn(),
                 inscrito,
                 esPresente,
-                encuestaRespondida
+                encuestaRespondida,
+                evento.getCodigoPublico()
         );
     }
 

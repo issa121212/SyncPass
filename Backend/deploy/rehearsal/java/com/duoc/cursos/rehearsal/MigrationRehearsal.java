@@ -126,7 +126,7 @@ public final class MigrationRehearsal {
 
     private static Flyway flyway(String db, String target) {
         var config = Flyway.configure().dataSource(ROOT + db, USER, PASSWORD).locations("filesystem:src/main/resources/db/migration");
-        if (target != null) config.target(MigrationVersion.fromVersion(target));
+        config.target(MigrationVersion.fromVersion(target == null ? "4" : target)); // Ensayo histórico V2 -> V4.
         return config.load();
     }
     private static Connection connection(String db) throws SQLException { return DriverManager.getConnection(ROOT + db, USER, PASSWORD); }

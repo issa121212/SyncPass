@@ -18,6 +18,7 @@ data class ProyectoEntity(
     val responsableId: Long? = null,
     @androidx.room.ColumnInfo(defaultValue = "'CONFIRMADO'") val syncState: String = "CONFIRMADO",
     val syncError: String? = null,
+    val codigoPublico: String? = null,
 )
 
 @Entity(tableName = "eventos")
@@ -44,6 +45,7 @@ data class EventoEntity(
     val actualizadoEn: String?,
     @androidx.room.ColumnInfo(defaultValue = "'CONFIRMADO'") val syncState: String = "CONFIRMADO",
     val syncError: String? = null,
+    val codigoPublico: String? = null,
 )
 
 @Entity(tableName = "perfil")

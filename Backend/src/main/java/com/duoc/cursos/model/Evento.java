@@ -21,6 +21,9 @@ public class Evento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "codigo_publico", nullable = false, unique = true, length = 16, updatable = false)
+    private String codigoPublico;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "proyecto_id", nullable = false)
     private Proyecto proyecto;
