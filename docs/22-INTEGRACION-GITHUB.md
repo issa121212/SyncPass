@@ -21,8 +21,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 5 | chore/ensayo-migraciones | PR #11 fusionado en develop |
 | 6 | test/integracion-android | PR #12 fusionado en develop |
 | 7 | fix/validacion-visible-zona | PR #13 fusionado en develop |
-| 8 | fix/restauracion-sesion | PR #14 abierto hacia develop |
-| 9 | fix/permiso-camara | Publicada; esperar integración anterior |
+| 8 | fix/restauracion-sesion | PR #14 fusionado en develop |
+| 9 | fix/permiso-camara | PR #15 abierto hacia develop |
 | 10 | feature/filtro-estado-eventos | Publicada; esperar integración anterior |
 | 11 | feature/codigos-publicos | Publicada; incluye compatibilidad V6 |
 | 12 | test/cobertura-minima-android | Publicada; incluye verificación mínima y esta guía |
@@ -68,4 +68,8 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Octavo paso abierto
 
-[PR #14: restauración de sesión](https://github.com/issa121212/SyncPass/pull/14), desde fix/restauracion-sesion hacia develop. Incluye tres commits nuevos y conserva la expiración original de Cognito. Queda pendiente de revisión y fusión manual. Después corresponde fix/permiso-camara.
+[PR #14: restauración de sesión](https://github.com/issa121212/SyncPass/pull/14), desde fix/restauracion-sesion hacia develop. Incluye tres commits nuevos y conserva la expiración original de Cognito. El usuario fusionó el PR #14 y se verificó su integración en develop (b2595db).
+
+## Noveno paso abierto
+
+[PR #15: recuperación del permiso de cámara](https://github.com/issa121212/SyncPass/pull/15), desde fix/permiso-camara hacia develop. Incluye siete commits nuevos de corrección y documentación operativa. Queda pendiente de revisión y fusión manual. Después corresponde feature/filtro-estado-eventos.
