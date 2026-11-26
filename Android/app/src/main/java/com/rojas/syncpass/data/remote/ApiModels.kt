@@ -26,6 +26,7 @@ data class ProyectoResponse(
     val responsable: ResponsableResponse? = null,
     val creadoEn: String? = null,
     val actualizadoEn: String? = null,
+    val codigoPublico: String? = null,
 )
 
 data class EventoResponse(
@@ -50,6 +51,7 @@ data class EventoResponse(
     val inscrito: Boolean = false,
     val esPresente: Boolean = false,
     val encuestaRespondida: Boolean = false,
+    val codigoPublico: String? = null,
 )
 
 data class InscripcionResponse(

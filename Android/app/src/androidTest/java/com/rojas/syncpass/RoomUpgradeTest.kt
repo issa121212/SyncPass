@@ -17,7 +17,7 @@ class RoomUpgradeTest {
         val name = "upgrade-v3-${UUID.randomUUID()}.db"
         createLegacyRoomFixture(context, name, 3)
         fun open() = Room.databaseBuilder(context, SyncPassDatabase::class.java, name)
-            .addMigrations(SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5).build()
+            .addMigrations(SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5, SyncPassDatabase.MIGRATION_5_6).build()
         var db = open()
         try {
             val project = requireNotNull(db.dao().proyectoLocal(7))

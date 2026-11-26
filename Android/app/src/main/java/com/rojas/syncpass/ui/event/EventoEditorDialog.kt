@@ -75,7 +75,10 @@ fun EventoEditorDialog(
                                 enabled = !guardando, role = androidx.compose.ui.semantics.Role.RadioButton,
                                 onClick = { proyectoId = item.id }), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                                 RadioButton(selected = proyectoId == item.id, onClick = null, enabled = !guardando)
-                                Text(item.nombre, modifier = Modifier.padding(start = 8.dp))
+                                Column(modifier = Modifier.padding(start = 8.dp)) {
+                                    Text(item.nombre)
+                                    com.rojas.syncpass.ui.components.CodigoPublicoLabel(item.codigoPublico, item.syncState)
+                                }
                             }
                         }
                         CampoEvento("Nombre *", nombre, { nombre = it }, !guardando)

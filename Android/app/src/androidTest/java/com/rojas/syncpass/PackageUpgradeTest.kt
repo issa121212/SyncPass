@@ -12,7 +12,7 @@ import java.util.UUID
 
 /** Dos ejecuciones explícitas, antes/después de adb install -r; nunca borra datos personales. */
 class PackageUpgradeTest {
-    @Test fun conservaDatosAlReemplazarApkAnteriorPorLaVersionConHiltYRoomV5() = runBlocking {
+    @Test fun conservaDatosAlReemplazarApkAnteriorPorLaVersionConHiltYRoomV6() = runBlocking {
         val stage = InstrumentationRegistry.getArguments().getString("upgradeStage")
         org.junit.Assume.assumeTrue(stage == "seed" || stage == "verify")
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -29,7 +29,7 @@ class PackageUpgradeTest {
             assertTrue("La verificación debe ejecutarse sobre el APK actualizado", hiltAvailable)
             assertNotNull("La actualización debe conservar SharedPreferences", preferences.getString("nonce", null))
             val db = Room.databaseBuilder(context, SyncPassDatabase::class.java, name)
-                .addMigrations(SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5).build()
+                .addMigrations(SyncPassDatabase.MIGRATION_3_4, SyncPassDatabase.MIGRATION_4_5, SyncPassDatabase.MIGRATION_5_6).build()
             try {
                 assertEquals("Proyecto anterior", db.dao().proyectoLocal(7)?.nombre)
                 assertEquals("CONFIRMADO", db.dao().proyectoLocal(7)?.syncState)
@@ -38,7 +38,7 @@ class PackageUpgradeTest {
                 assertEquals("Sede anterior", db.recintoDao().obtener(1)?.nombre)
                 assertEquals(8.5, db.dao().operacion("legacy-capture")?.precisionMetros)
                 assertNull(db.dao().operacion("legacy-capture")?.ubicacionEn)
-                assertEquals(5, db.openHelper.readableDatabase.version)
+                assertEquals(6, db.openHelper.readableDatabase.version)
             } finally { db.close() }
         }
     }

@@ -85,7 +85,7 @@ class OfflineCreationsTest {
                     if (rejectProject == request.nombre) throw HttpException(Response.error<Any>(403, "{}".toResponseBody()))
                     val result = savedProjects.getOrPut(requireNotNull(request.clientUuid)) {
                         ProyectoResponse(id = 100L + savedProjects.size, nombre = request.nombre,
-                            responsable = ResponsableResponse(7, "Ana", "ana@example.com"))
+                            responsable = ResponsableResponse(7, "Ana", "ana@example.com"), codigoPublico = "PRY-ABCDEF123456")
                     }
                     if (loseResponse) { loseResponse = false; throw IOException("Respuesta perdida") }
                     result
@@ -95,7 +95,7 @@ class OfflineCreationsTest {
                     calls += "EVENTO"; eventRequests += request
                     savedEvents.getOrPut(requireNotNull(request.clientUuid)) {
                         EventoResponse(id = 200L + savedEvents.size, proyectoId = request.proyectoId,
-                            proyectoNombre = "Proyecto", nombre = request.nombre, fechaHora = request.fechaHora)
+                            proyectoNombre = "Proyecto", nombre = request.nombre, fechaHora = request.fechaHora, codigoPublico = "EVT-123456ABCDEF")
                     }
                 }
                 else -> Answers.RETURNS_DEFAULTS.answer(call)
@@ -125,7 +125,11 @@ class OfflineCreationsTest {
     @Test fun confirmaPrimeroProyectoLuegoEventoYReasignaLosIdentificadores() = runBlocking {
         val projectId = repo.project(ProyectoInput("Proyecto"))
         val eventId = repo.event(event(-projectId))
+        assertNull(store.projects.getValue(-projectId).codigoPublico)
+        assertNull(store.events.getValue(-eventId).codigoPublico)
         assertEquals(2, repo.synchronize().first)
+        assertEquals("PRY-ABCDEF123456", store.projects.getValue(100L).codigoPublico)
+        assertEquals("EVT-123456ABCDEF", repo.eventResult(eventId).codigoPublico)
         assertEquals(listOf("PROYECTO", "EVENTO"), server.calls)
         assertEquals(100L, server.eventRequests.single().proyectoId)
         assertFalse(store.projects.containsKey(-projectId))
@@ -146,6 +150,8 @@ class OfflineCreationsTest {
         assertEquals(server.projectRequests.first(), server.projectRequests.last())
         assertEquals(1, server.savedProjects.size)
         assertEquals(1, server.savedEvents.size)
+        assertEquals(server.savedProjects.values.single().codigoPublico, store.projects.getValue(100L).codigoPublico)
+        assertEquals(server.savedEvents.values.single().codigoPublico, store.events.getValue(200L).codigoPublico)
     }
 
     @Test fun falloAlConfirmarEnLocalSeRecuperaConElMismoUuid() = runBlocking {

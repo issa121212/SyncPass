@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.rojas.syncpass.domain.model.*
 import com.rojas.syncpass.domain.model.ProyectoInput
 import com.rojas.syncpass.ui.home.ProyectoDialog
+import com.rojas.syncpass.ui.components.CodigoPublicoLabel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +61,7 @@ fun GestionScreen(vm: GestionViewModel, onBack: () -> Unit) {
                         val puede = admin || p.responsableId == perfil?.usuarioId
                         Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) {
                             Text(p.nombre, style = MaterialTheme.typography.titleMedium)
+                            CodigoPublicoLabel(p.codigoPublico, p.syncState)
                             Text(p.descripcion.orEmpty())
                             if (p.syncState != "CONFIRMADO") Text("${p.syncState}: ${p.syncError ?: "Se enviará al sincronizar"}")
                             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -95,6 +97,7 @@ fun GestionScreen(vm: GestionViewModel, onBack: () -> Unit) {
             d.ifBlank { null }, a.ifBlank { null }, u.ifBlank { null }, i.ifBlank { null }, f.ifBlank { null },
             proyectoEditar?.estado ?: "PLANIFICADO")) { proyectoForm = false } })
     proyectoDetalle?.let { p -> DetalleDialog(p.nombre, listOf(
+        "Código" to codigoPublicoVisible(p.codigoPublico, p.syncState),
         "Descripcion" to p.descripcion.orEmpty(), "Area" to p.areaTematica.orEmpty(),
         "Unidad vecinal" to p.unidadVecinal.orEmpty(), "Inicio" to p.fechaInicio.orEmpty(),
         "Fin" to p.fechaFin.orEmpty(), "Estado" to p.estado,

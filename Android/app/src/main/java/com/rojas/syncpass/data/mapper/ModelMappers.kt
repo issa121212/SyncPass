@@ -6,13 +6,13 @@ import com.rojas.syncpass.data.remote.*
 
 import com.rojas.syncpass.domain.model.*
 
-fun ProyectoEntity.toDomain() = Proyecto(id = id, nombre = nombre, descripcion = descripcion, areaTematica = areaTematica, unidadVecinal = unidadVecinal, fechaInicio = fechaInicio, fechaFin = fechaFin, estado = estado, responsableNombre = responsableNombre, responsableEmail = responsableEmail, responsableId = responsableId, syncState = syncState, syncError = syncError)
+fun ProyectoEntity.toDomain() = Proyecto(id = id, nombre = nombre, descripcion = descripcion, areaTematica = areaTematica, unidadVecinal = unidadVecinal, fechaInicio = fechaInicio, fechaFin = fechaFin, estado = estado, responsableNombre = responsableNombre, responsableEmail = responsableEmail, responsableId = responsableId, syncState = syncState, syncError = syncError, codigoPublico = codigoPublico)
 
-fun Proyecto.toEntity() = ProyectoEntity(id = id, nombre = nombre, descripcion = descripcion, areaTematica = areaTematica, unidadVecinal = unidadVecinal, fechaInicio = fechaInicio, fechaFin = fechaFin, estado = estado, responsableNombre = responsableNombre, responsableEmail = responsableEmail, responsableId = responsableId, syncState = syncState, syncError = syncError)
+fun Proyecto.toEntity() = ProyectoEntity(id = id, nombre = nombre, descripcion = descripcion, areaTematica = areaTematica, unidadVecinal = unidadVecinal, fechaInicio = fechaInicio, fechaFin = fechaFin, estado = estado, responsableNombre = responsableNombre, responsableEmail = responsableEmail, responsableId = responsableId, syncState = syncState, syncError = syncError, codigoPublico = codigoPublico)
 
-fun EventoEntity.toDomain() = Evento(id = id, proyectoId = proyectoId, proyectoNombre = proyectoNombre, nombre = nombre, descripcion = descripcion, fechaHora = fechaHora, cupos = cupos, inscritos = inscritos, presentes = presentes, recinto = recinto, direccion = direccion, latitud = latitud, longitud = longitud, radioMetros = radioMetros, qrContenido = qrContenido, estado = estado, inscrito = inscrito, esPresente = esPresente, encuestaRespondida = encuestaRespondida, actualizadoEn = actualizadoEn, syncState = syncState, syncError = syncError)
+fun EventoEntity.toDomain() = Evento(id = id, proyectoId = proyectoId, proyectoNombre = proyectoNombre, nombre = nombre, descripcion = descripcion, fechaHora = fechaHora, cupos = cupos, inscritos = inscritos, presentes = presentes, recinto = recinto, direccion = direccion, latitud = latitud, longitud = longitud, radioMetros = radioMetros, qrContenido = qrContenido, estado = estado, inscrito = inscrito, esPresente = esPresente, encuestaRespondida = encuestaRespondida, actualizadoEn = actualizadoEn, syncState = syncState, syncError = syncError, codigoPublico = codigoPublico)
 
-fun Evento.toEntity() = EventoEntity(id = id, proyectoId = proyectoId, proyectoNombre = proyectoNombre, nombre = nombre, descripcion = descripcion, fechaHora = fechaHora, cupos = cupos, inscritos = inscritos, presentes = presentes, recinto = recinto, direccion = direccion, latitud = latitud, longitud = longitud, radioMetros = radioMetros, qrContenido = qrContenido, estado = estado, inscrito = inscrito, esPresente = esPresente, encuestaRespondida = encuestaRespondida, actualizadoEn = actualizadoEn, syncState = syncState, syncError = syncError)
+fun Evento.toEntity() = EventoEntity(id = id, proyectoId = proyectoId, proyectoNombre = proyectoNombre, nombre = nombre, descripcion = descripcion, fechaHora = fechaHora, cupos = cupos, inscritos = inscritos, presentes = presentes, recinto = recinto, direccion = direccion, latitud = latitud, longitud = longitud, radioMetros = radioMetros, qrContenido = qrContenido, estado = estado, inscrito = inscrito, esPresente = esPresente, encuestaRespondida = encuestaRespondida, actualizadoEn = actualizadoEn, syncState = syncState, syncError = syncError, codigoPublico = codigoPublico)
 
 fun PerfilEntity.toDomain() = Perfil(id = id, usuarioId = usuarioId, nombre = nombre, email = email, roles = roles, qrContenido = qrContenido)
 
@@ -56,6 +56,7 @@ fun ProyectoResponse.toEntity() = ProyectoEntity(
 
         responsableEmail = responsable?.email,
         responsableId = responsable?.id,
+        codigoPublico = codigoPublico,
 
     )
 
@@ -100,6 +101,7 @@ fun EventoResponse.toEntity() = EventoEntity(
         encuestaRespondida = encuestaRespondida,
 
         actualizadoEn = actualizadoEn,
+        codigoPublico = codigoPublico,
 
     )
 
