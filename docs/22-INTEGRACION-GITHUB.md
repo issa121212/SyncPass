@@ -16,8 +16,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 |---|---|---|
 | 1 | feature/inyeccion-hilt | PR #7 fusionado en develop |
 | 2 | feature/ubicacion-eventos | PR #8 fusionado en develop |
-| 3 | feature/geolocalizacion-asistencia | PR #9 abierto hacia develop |
-| 4 | feature/creacion-offline | Publicada; esperar integración anterior |
+| 3 | feature/geolocalizacion-asistencia | PR #9 fusionado en develop |
+| 4 | feature/creacion-offline | PR #10 abierto hacia develop |
 | 5 | chore/ensayo-migraciones | Publicada; esperar integración anterior |
 | 6 | test/integracion-android | Publicada; esperar integración anterior |
 | 7 | fix/validacion-visible-zona | Publicada; esperar integración anterior |
@@ -48,4 +48,8 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Tercer paso abierto
 
-[PR #9: geolocalización de asistencia](https://github.com/issa121212/SyncPass/pull/9), desde feature/geolocalizacion-asistencia hacia develop. Incluye cuatro commits nuevos tras las dependencias ya integradas. Queda pendiente de revisión y fusión manual. Después corresponde feature/creacion-offline.
+[PR #9: geolocalización de asistencia](https://github.com/issa121212/SyncPass/pull/9), desde feature/geolocalizacion-asistencia hacia develop. Incluye cuatro commits nuevos tras las dependencias ya integradas. El usuario fusionó el PR #9 y se verificó su integración en develop (c57a701).
+
+## Cuarto paso abierto
+
+[PR #10: creación offline](https://github.com/issa121212/SyncPass/pull/10), desde feature/creacion-offline hacia develop. Incluye cinco commits nuevos, con cola local y creaciones idempotentes en el backend. Queda pendiente de revisión y fusión manual. Después corresponde chore/ensayo-migraciones.
