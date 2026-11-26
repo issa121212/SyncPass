@@ -9,10 +9,12 @@ flowchart LR
     participante["Participante"]
     syncpass["SyncPass<br/>Gestiona proyectos, eventos y asistencia"]
     cognito["Amazon Cognito<br/>Servicio externo de identidad"]
+    maps["OpenFreeMap<br/>Estilos y mapas externos"]
     docente -->|"Gestiona proyectos y eventos"| syncpass
     estudiante -->|"Escanea QR en recepción"| syncpass
     participante -->|"Se inscribe, presenta su QR y responde encuestas"| syncpass
     syncpass -->|"Delega el inicio de sesión y verifica los tokens"| cognito
+    syncpass -->|"Carga cartografía para elegir una zona"| maps
 ```
 
 ## C2 · Contenedores y servicios de infraestructura
@@ -20,6 +22,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     cognito["Amazon Cognito<br/>OpenID Connect"]
+    maps["OpenFreeMap<br/>Estilos y teselas"]
     subgraph sistema["SyncPass"]
         android["Aplicación Android<br/>Kotlin y Compose"]
         room[("Datos locales del dispositivo<br/>Room / SQLite")]
@@ -37,38 +40,67 @@ flowchart LR
         nginx -->|"HTTP local · 8080"| api
         api -->|"JDBC local · 5432"| postgres
     end
+    android -->|"HTTPS: estilos y teselas mediante MapLibre"| maps
     android -->|"Inicio de sesión y canje del código"| cognito
     web -->|"Inicio de sesión y canje del código"| cognito
     api -->|"Consulta claves públicas JWKS"| cognito
 ```
 
-Los clientes obtienen sus tokens de Cognito y envían el access token a la API. Spring Security valida el token y el backend aplica los permisos. El diagrama muestra PostgreSQL en EC2, que es el despliegue documentado. La conexión a Supabase queda pendiente.
+Los clientes obtienen sus tokens de Cognito y envían el access token a la API. Spring Security valida el token y el backend aplica los permisos. El diagrama muestra PostgreSQL en EC2, que es el despliegue documentado. Se mantiene PostgreSQL en EC2 conforme a la autorización docente; no se plantea una migración a Supabase en esta entrega.
 
 ## C3 · Componentes de la aplicación Android
 
 ```mermaid
 flowchart TB
-    backend["API REST de SyncPass"]
-    sqlite[("SQLite del dispositivo")]
-    subgraph app["Aplicación Android"]
-        screens["View · Pantallas y componentes Compose<br/>HomeScreen, GestionScreen, EventoDetalleScreen"]
-        vm["ViewModel · Coordina acciones y estado<br/>HomeViewModel, GestionViewModel, ScannerViewModel"]
-        domain["Dominio · Modelos, reglas y contratos<br/>Evento, Recinto, EventoRules, SyncPassOperations"]
-        repo["Repositorios · Implementan los contratos<br/>SyncPassRepository, ApiProyectosRepository, RoomRecintosRepository"]
-        remote["Fuente remota · Retrofit, OkHttp y DTO<br/>SyncPassApi, ApiClient, ApiModels"]
-        local["Fuente local · Room y DAO<br/>SyncPassDatabase, SyncPassDao, RecintoDao"]
-        worker["SyncWorker · Sincronización diferida"]
-        screens -->|"Envía acciones mediante callbacks"| vm
-        vm -->|"Publica estado observable"| screens
-        vm -->|"Usa los contratos de repositorio"| domain
-        repo -->|"Implementa los contratos y usa modelos del dominio"| domain
-        repo -->|"Consulta y envía datos"| remote
-        repo -->|"Lee y guarda caché, recintos y pendientes"| local
-        worker -->|"Pide procesar la cola"| repo
+    backend["API REST compartida<br/>Spring Boot"]
+    sqlite[("SQLite por cuenta")]
+    maps["OpenFreeMap"]
+    sensors["Ubicación del dispositivo<br/>LocationManager"]
+    subgraph app["Contenedor Android: Kotlin y Compose"]
+        view["View<br/>Home, Gestión, editor, mapa y recepción QR"]
+        vm["ViewModels con Hilt<br/>Estado, acciones y cancelación"]
+        domain["Dominio<br/>SyncPassOperations, LocationSource y reglas"]
+        repo["SyncPassRepository<br/>Coordinador y Mutex por cuenta"]
+        creation["OfflineCreations<br/>Orden padre/hijo y reintentos"]
+        attendance["RoomAsistenciasRepository<br/>Captura durable y resultado"]
+        local["CreationStore / RoomCreationStore<br/>DAO, transacciones y caché"]
+        remote["SyncPassApi / ApiClient<br/>Retrofit, DTO y Bearer por cuenta"]
+        location["AndroidLocationSource<br/>Permisos, vigencia y cancelación"]
+        map["EventZoneMap<br/>MapLibre Native"]
+        hilt["Hilt<br/>Singleton y AccountComponent"]
+        worker["SyncWorker<br/>Red y sesión válida"]
+        view -->|"Callbacks"| vm
+        vm -->|"StateFlow"| view
+        vm -->|"Contratos y validación"| domain
+        repo -.->|"Implementa"| domain
+        vm -->|"Operaciones"| repo
+        vm -->|"Ubicación reciente"| location
+        location -.->|"Implementa LocationSource"| domain
+        repo --> creation
+        repo --> attendance
+        repo --> local
+        creation --> local
+        attendance --> local
+        creation --> remote
+        repo --> remote
+        view --> map
+        hilt -.->|"Dependencias aisladas por cuenta"| repo
+        hilt -.-> vm
+        hilt -.-> location
+        worker -->|"Comparte el coordinador"| repo
     end
+    local --> sqlite
     remote -->|"HTTPS mediante API Gateway"| backend
-    local -->|"Consultas y transacciones"| sqlite
+    location --> sensors
+    map -->|"HTTPS"| maps
 ```
+
+Hilt proporciona dependencias mediante módulos y constructores. `AccountComponent` agrupa Room, API y repositorio para una cuenta; `AccountDependencies` cambia ese grupo al cambiar de usuario. El ámbito ViewModel recibe el contrato de operaciones de la cuenta activa. `SessionViewModel` conserva el almacén de ViewModels de navegación y lo limpia al cerrar sesión o cambiar de cuenta.
+
+La cola de creaciones se procesa antes que la de inscripciones, asistencias y encuestas. `OfflineCreations` depende de la frontera `CreationStore`; `RoomCreationStore` aplica las transacciones del DAO. `RoomAsistenciasRepository` persiste la evidencia de captura y delega el envío al coordinador. El mismo Mutex coordina sincronización manual y trabajo de fondo.
+
+Estos diagramas describen el código de la entrega local, no acreditan que las nuevas migraciones o políticas estén desplegadas en EC2. La geografía inicia en modo de auditoría compatible; la imposición obligatoria depende de actualizar y verificar todos los clientes.
+
 
 `AppContainer` construye las dependencias por cuenta. En ejecución, cuando un ViewModel llama a un contrato de dominio, la operación se ejecuta en su repositorio concreto. Compose vuelve a dibujar la interfaz cuando cambia el estado observable.
 
@@ -107,14 +139,16 @@ Paquete base: `com.rojas.syncpass`, dentro de `Android/app/src/main/java/`.
 | `data/local/` | Tablas SQLite, consultas y transacciones Room | SyncPassDatabase, SyncPassDao, RecintoDao, Entities |
 | `data/mapper/` | Conversión entre DTO, entidades y dominio | ModelMappers |
 | `data/session/` | Sesión y cifrado de tokens | SessionStore, TokenVault |
-| `core/` | Configuración, formato, lectura JWT y ubicación | AppConfig, FormatoFechaHora, UbicacionHelper |
+| `core/` | Configuración, formato y lectura JWT | AppConfig, FormatoFechaHora, JwtDecoder |
+| `data/location/` | Fuente de ubicación del dispositivo | AndroidLocationSource |
+| `di/` | Inyección y aislamiento por cuenta | SessionModule, AccountComponent, LocationModule |
 | `work/` | Ejecución diferida de la sincronización | SyncWorker, SyncScheduler |
 
-`SyncPassApplication` crea `AppContainer`. La composición de dependencias es manual; no se utiliza Hilt/Dagger. El contenedor crea API, Room y repositorios por cuenta. El módulo `:cognito-auth`, paquete `com.cognitoauth`, encapsula AppAuth, descubrimiento OIDC, solicitudes y canje de código. La app conserva la navegación y persistencia de sesión.
+`SyncPassApplication` utiliza `@HiltAndroidApp` y `MainActivity` es un punto de entrada de Hilt. Los ViewModels se obtienen con `hiltViewModel`. Los módulos proveen sesión, API, Room, repositorios y ubicación. El módulo `:cognito-auth` encapsula AppAuth y el flujo OIDC; la app mantiene la navegación y la persistencia de sesión. Véase [la migración a Hilt](09-INYECCION-HILT.md).
 
 Los ViewModels usan `viewModelScope`, Flow/StateFlow y estados inmutables. Compose recibe estado y callbacks; los composables no acceden directamente a SQL o Retrofit. Room emite los cambios de datos que alimentan la UI. `stateIn` y `WhileSubscribed` permiten compartir flujos durante la observación.
 
-Se utiliza MVVM con separación presentación/dominio/datos, no una implementación estricta de Clean Architecture: no existe una clase de caso de uso para cada acción y `SyncPassRepository` sigue coordinando varias capacidades. La delegación a repositorios de proyectos y recintos reduce parte de esa responsabilidad.
+Se utiliza MVVM con separación presentación/dominio/datos, no una implementación estricta de Clean Architecture: no existe una clase de caso de uso para cada acción y `SyncPassRepository` sigue coordinando varias capacidades. La delegación de proyectos y recintos, `RoomAsistenciasRepository` y `OfflineCreations` separa responsabilidades concretas sin crear una clase por cada acción.
 
 ### Dashboards
 
@@ -126,7 +160,7 @@ Android utiliza `HomeScreen` compartida con secciones y acciones condicionales d
 
 ### Ejemplo: recinto local
 
-`GestionScreen` -> `GestionViewModel` -> contrato de recintos -> `RoomRecintosRepository` -> `RecintoDao` -> SQLite. No existe solicitud HTTP para guardar el recinto. Elegirlo en el formulario copia sus campos al evento; guardar ese evento sí envía esos valores a la API.
+`GestionScreen` -> `GestionViewModel` -> contrato de recintos -> `RoomRecintosRepository` -> `RecintoDao` -> SQLite. No existe solicitud HTTP para guardar el recinto. Elegirlo en el formulario copia sus campos al evento; guardar ese evento conserva los valores en la solicitud local y los envía a la API al sincronizar.
 
 ## Backend fs2-api: Spring por capas
 
@@ -157,7 +191,10 @@ No existe un mapper independiente para todo: conversiones como `toResponse` est�
 - Asistencia: une usuario y evento, presente, timestamp, origen, ubicación opcional y clientUuid.
 - Encuesta: asociada a asistencia; satisfacción, utilidad, comentarios y fecha.
 - Recinto local: nombre, dirección, coordenadas y radio; no es una entidad de la API.
-- Pendiente local: tipo de operación, evento, UUID, contenido necesario y estado/error de envío.
+- Pendiente local: tipo de operación, evento, UUID, contenido necesario y estado/error de envío; conserva la hora de posición y de captura para asistencia.
+- Creación local: UUID, tipo, payload inmutable, proyecto dependiente, estado/error y correspondencia local-remota.
+- Creación de servidor: usuario, tipo, UUID, huella e ID remoto, guardados junto al recurso en una transacción.
+- Evidencia geográfica: hora de posición, estado y motivo de evaluación; los registros históricos pueden carecer de estos campos.
 
 Los conteos de inscritos/presentes se calculan en el servidor; no son una autorización aportada por el cliente. Las fechas de eventos usan `LocalDateTime` sin zona; los timestamps de asistencia/envío usan `Instant`.
 
@@ -166,3 +203,11 @@ Room mantiene caché de perfil, proyectos y eventos, además de recintos y pendi
 ## Límites arquitectónicos
 
 La base local no es una réplica completa de todas las tablas del servidor. Las listas de asistentes y encuestas se consultan remotamente. Las consultas de conteos por evento pueden aumentar el número de accesos JPA con catálogos grandes; no hay benchmark de carga ni paginación completa que justifique prometer escalabilidad ilimitada.
+
+## Flujo de creación offline
+
+La View envía un formulario al ViewModel. El coordinador valida y guarda una creación y su tarjeta local en una transacción. Al sincronizar, verifica la capacidad idempotente del backend, envía primero el proyecto y confirma su correspondencia en Room; luego envía sus eventos con el ID remoto. Una interrupción conserva la solicitud y el UUID para reanudar. La API usa `CreationIdempotency`, bloqueo por usuario y una restricción única para recuperar el mismo recurso ante reintentos.
+
+## Flujo geográfico de recepción
+
+El receptor lee el QR del participante en un evento confirmado. `ScannerViewModel` obtiene una ubicación reciente mediante `LocationSource`, valida su precisión y margen dentro de la zona y guarda la captura antes de enviarla. El backend vuelve a evaluar con la zona actual mediante `AttendanceLocationPolicy`. `AUDIT` conserva clientes anteriores y registra el resultado; `ENFORCE` rechaza incumplimientos. Los detalles y límites están en [la política geográfica](11-GEOLOCALIZACION-ASISTENCIA.md).
