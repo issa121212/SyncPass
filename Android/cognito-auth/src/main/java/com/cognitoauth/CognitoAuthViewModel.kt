@@ -3,6 +3,8 @@ package com.cognitoauth
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +31,8 @@ data class CognitoUiState(
  * 3. `startLogout(idToken)` -> emite `pendingLogoutIntent`.
  * 4. `consumeAuthIntent()/consumeLogoutIntent()` limpian el intent tras lanzarlo.
  */
-class CognitoAuthViewModel(
+@HiltViewModel
+class CognitoAuthViewModel @Inject constructor(
     private val manager: CognitoAuthManager,
 ) : ViewModel() {
 

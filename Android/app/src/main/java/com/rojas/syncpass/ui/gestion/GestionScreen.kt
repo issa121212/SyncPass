@@ -9,20 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rojas.syncpass.domain.model.*
 import com.rojas.syncpass.domain.model.ProyectoInput
-import com.rojas.syncpass.domain.SyncPassOperations
 import com.rojas.syncpass.ui.home.ProyectoDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GestionScreen(repository: SyncPassOperations, onBack: () -> Unit) {
-    val vm: GestionViewModel = viewModel(factory = object : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST") override fun <T : ViewModel> create(modelClass: Class<T>): T = GestionViewModel(repository) as T
-    })
+fun GestionScreen(vm: GestionViewModel, onBack: () -> Unit) {
     val proyectos by vm.proyectos.collectAsState()
     val recintos by vm.recintos.collectAsState()
     val perfil by vm.perfil.collectAsState()

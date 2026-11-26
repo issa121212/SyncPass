@@ -13,6 +13,7 @@ Documentación técnica y funcional de la entrega de SyncPass Android y su backe
 7. [Ejecución y despliegue](06-EJECUCION-Y-DESPLIEGUE.md).
 8. [Tecnologías y librerías](07-TECNOLOGIAS.md).
 9. [Pruebas, limitaciones, Gitflow e IA](08-VALIDACION-Y-GITFLOW.md).
+10. [Migración a Hilt y dependencias por cuenta](09-INYECCION-HILT.md).
 
 ## Cómo interpretar el alcance
 

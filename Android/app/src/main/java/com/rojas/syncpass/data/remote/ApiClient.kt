@@ -23,24 +23,7 @@ object ApiClient {
         val client = OkHttpClient.Builder()
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor { chain ->
-
-                if (sessionStore.accountKey() != accountKey || !sessionStore.hasValidSession()) {
-                    throw SessionInvalidIOException()
-                }
-                val token = sessionStore.currentAccessToken()
-
-                val request = if (token.isNullOrBlank()) {
-                    chain.request()
-                } else {
-                    chain.request()
-                        .newBuilder()
-                        .header("Authorization", "Bearer $token")
-                        .build()
-                }
-
-                chain.proceed(request)
-            }
+            .addInterceptor(AccountAuthorizationInterceptor(sessionStore, accountKey))
             .addInterceptor(logging)
             .build()
 

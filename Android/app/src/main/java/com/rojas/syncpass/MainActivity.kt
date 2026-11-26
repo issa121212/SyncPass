@@ -13,15 +13,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.cognitoauth.CognitoAuthManager
 import com.cognitoauth.CognitoAuthViewModel
 import com.rojas.syncpass.core.config.CognitoAppConfig
-import com.rojas.syncpass.ui.login.CognitoViewModelFactory
+import com.rojas.syncpass.ui.login.SessionViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.key
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.rojas.syncpass.ui.login.LoginScreen
 import com.rojas.syncpass.ui.navigation.SyncPassApp
 import com.rojas.syncpass.ui.theme.SyncPassTheme
@@ -30,18 +30,10 @@ import com.rojas.syncpass.ui.theme.SyncPassTheme
  * Punto de entrada. Cognito Hosted UI entrega los tokens; la sesión se guarda
  * en SessionStore y las pantallas de dominio usan el access token vía OkHttp.
  */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val cognitoManager: CognitoAuthManager? by lazy {
-        if (CognitoAppConfig.isConfigured) CognitoAuthManager(this, CognitoAppConfig.config)
-        else null
-    }
-
-    private val cognitoVm: CognitoAuthViewModel by viewModels {
-        cognitoManager
-            ?.let { CognitoViewModelFactory(it) }
-            ?: throw IllegalStateException("Cognito no configurado (.env)")
-    }
+    private val cognitoVm: CognitoAuthViewModel by viewModels()
+    private val sessionVm: SessionViewModel by viewModels()
 
     private val authLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -62,12 +54,9 @@ class MainActivity : ComponentActivity() {
         }
         enableEdgeToEdge()
 
-        val container = (application as SyncPassApplication).container
-        val sessionStore = container.sessionStore
-
         setContent {
             SyncPassTheme {
-                if (cognitoManager == null) {
+                if (!CognitoAppConfig.isConfigured) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
@@ -77,7 +66,7 @@ class MainActivity : ComponentActivity() {
                     return@SyncPassTheme
                 }
 
-                var loggedIn by remember { mutableStateOf(false) }
+                val sessionOwner by sessionVm.owner.collectAsState()
                 val cognitoState by cognitoVm.uiState.collectAsState()
 
                 LaunchedEffect(cognitoState.pendingAuthIntent) {
@@ -100,12 +89,12 @@ class MainActivity : ComponentActivity() {
                 }
                 LaunchedEffect(cognitoState.tokens) {
                     cognitoState.tokens?.let {
-                        sessionStore.save(it)
-                        loggedIn = true
+                        sessionVm.open(it)
                     }
                 }
 
-                if (!loggedIn) {
+                val owner = sessionOwner
+                if (owner == null) {
                     LoginScreen(
                         isLoading = cognitoState.isLoading,
                         error = cognitoState.error,
@@ -113,15 +102,16 @@ class MainActivity : ComponentActivity() {
                         onErrorShown = { cognitoVm.onErrorShown() },
                     )
                 } else {
-                    SyncPassApp(
-                        repository = container.repository,
-                        onLogout = {
-                            loggedIn = false
-                            sessionStore.clear()
-                            // Limpia la sesión de Cognito si el Hosted UI sigue disponible.
-                            cognitoVm.startLogout()
-                        },
-                    )
+                    key(owner) {
+                        CompositionLocalProvider(LocalViewModelStoreOwner provides owner) {
+                            SyncPassApp(
+                                onLogout = {
+                                    sessionVm.close()
+                                    cognitoVm.startLogout()
+                                },
+                            )
+                        }
+                    }
                 }
             }
         }

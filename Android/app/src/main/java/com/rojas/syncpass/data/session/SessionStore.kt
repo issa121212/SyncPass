@@ -30,6 +30,16 @@ class SessionStore(context: Context) {
 
     fun currentAccessToken(): String? = _tokens.value?.accessToken
 
+    /** Valida y devuelve el mismo snapshot para impedir mezclar cuenta y token. */
+    fun accessTokenFor(accountKey: String): String? {
+        val token = _tokens.value?.accessToken ?: return null
+        val claims = JwtDecoder.decode(token).getOrNull() ?: return null
+        return token.takeIf {
+            !claims.isExpired && claims.sub.isNotBlank() && claims.iss.isNotBlank() &&
+                "${claims.iss}|${claims.sub}" == accountKey
+        }
+    }
+
     fun currentIdToken(): String? = _tokens.value?.idToken
 
     fun cognitoName(): String? {
