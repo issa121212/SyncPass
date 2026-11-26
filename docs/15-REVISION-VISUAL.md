@@ -25,3 +25,13 @@ Se conserva el desplazamiento cuando el tamaño de pantalla, el teclado o la acc
 Se abrió el lector desde el detalle de un evento con una cuenta docente. Con el permiso de cámara no concedido, la app mostró «Se necesita acceso a la cámara para leer el código QR» y el botón «Permitir cámara», manteniendo la navegación para volver. No se leyó ningún QR ni se registró una nueva asistencia. La vista previa tras aceptar el permiso y la cámara física siguen pendientes de comprobación; la respuesta al diálogo de privacidad se realiza manualmente.
 
 Se corrigió la [restauración de sesiones vigentes](16-RESTAURACION-SESION.md) y se comprobó mediante pruebas unitarias y una actualización del APK principal después de un login real: la app recuperó el inicio de docente sin pedir otra autenticación. Siguen pendientes logout real, permiso y ubicación del dispositivo, vista previa tras conceder cámara y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
+
+## Recuperación de cámara bloqueada
+
+Durante la revisión, pulsar «Permitir cámara» no abrió el diálogo. El estado del paquete confirmó `granted=false` con `USER_FIXED`: Android había bloqueado nuevas solicitudes. Repetir la solicitud no permite recuperarlo.
+
+Se ajustó `QrScannerScreen.kt` para distinguir una solicitud rechazada sin posibilidad de volver a mostrar el diálogo. En ese caso explica el bloqueo y ofrece «Abrir ajustes», que dirige a la información de esta aplicación. Al reanudar la pantalla consulta nuevamente el permiso y permite cargar la cámara si el usuario lo concedió en ajustes. La primera solicitud y el rechazo temporal conservan el flujo normal. La decisión de privacidad sigue siendo manual.
+
+La vista previa y la concesión desde ajustes requieren una comprobación manual posterior a esta corrección. No se cambian permisos mediante comandos ni se registra asistencia para probar este comportamiento.
+
+Validación de la corrección: compilación e instalación del APK principal correctas, 91 pruebas unitarias aprobadas sin fallos y lint completado sin errores. Estas pruebas no sustituyen la comprobación manual del permiso del sistema y la vista previa.
