@@ -11,6 +11,9 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mockito.*
 import java.io.IOException
+import java.time.Instant
+import com.rojas.syncpass.domain.model.AttendanceCapture
+import com.rojas.syncpass.domain.model.AttendanceOutcome
 
 class SyncPassRepositoryTest {
     private val api = mock(SyncPassApi::class.java)
@@ -57,7 +60,7 @@ class SyncPassRepositoryTest {
     @Test fun scanDoesNotMarkTeacherPresent() = runBlocking {
         `when`(dao.pendientes()).thenReturn(emptyList())
         `when`(dao.contarPendiente(anyString())).thenReturn(0)
-        assertTrue(repository.registrarAsistenciaEscaneo(7, "STUDENT", null, null, null).getOrThrow())
+        assertEquals(AttendanceOutcome.Confirmed, repository.registrarAsistenciaEscaneo(7, "STUDENT", AttendanceCapture(Instant.parse("2026-10-25T12:00:00Z"), null)).getOrThrow())
         verify(dao, never()).marcarPresente(7)
         verify(dao, never()).actualizarPresencia(7, true)
     }
@@ -85,10 +88,10 @@ class SyncPassRepositoryTest {
     @Test fun offlineScanIsPendingRatherThanConfirmed() = runBlocking {
         val p = pending("a", PendienteEntity.TIPO_ASISTENCIA_ESCANEO)
         `when`(dao.pendientes()).thenReturn(listOf(p))
-        `when`(dao.contarPendiente(anyString())).thenReturn(1)
+        `when`(dao.operacion(anyString())).thenReturn(p)
         `when`(api.escanear(7, AsistenciaRequest(codigoQr = "STUDENT",
             marcadoEn = p.marcadoEn, clientUuid = "a"))).thenAnswer { throw IOException("offline") }
-        assertFalse(repository.registrarAsistenciaEscaneo(7, "STUDENT", null, null, null).getOrThrow())
+        assertEquals(AttendanceOutcome.Pending, repository.registrarAsistenciaEscaneo(7, "STUDENT", AttendanceCapture(Instant.parse(p.marcadoEn), null)).getOrThrow())
         verify(dao, never()).marcarSincronizado("a")
     }
 

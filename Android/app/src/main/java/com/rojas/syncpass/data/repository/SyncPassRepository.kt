@@ -97,33 +97,12 @@ class SyncPassRepository(
             dao.marcarInscrito(evento.id)
         }
     }
-    /**
-     * El docente escanea el QR personal del estudiante. Se guarda localmente
-     * antes de intentar la red: si falla, queda en la cola de sincronización.
-     */
+    private val asistencias = RoomAsistenciasRepository(dao, ::sincronizar)
     override suspend fun registrarAsistenciaEscaneo(
         eventoId: Long,
         codigoQr: String,
-        latitud: Double?,
-        longitud: Double?,
-        precisionMetros: Double?,
-    ): Result<Boolean> = resultado {
-        val uuid = UUID.randomUUID().toString()
-        dao.encolar(
-            PendienteEntity(
-                clientUuid = uuid,
-                tipo = PendienteEntity.TIPO_ASISTENCIA_ESCANEO,
-                eventoId = eventoId,
-                codigoQr = codigoQr,
-                marcadoEn = Instant.now().toString(),
-                latitud = latitud,
-                longitud = longitud,
-                precisionMetros = precisionMetros,
-            )
-        )
-        sincronizar()
-        dao.contarPendiente(uuid) == 0
-    }
+        captura: AttendanceCapture,
+    ): Result<AttendanceOutcome> = asistencias.capture(eventoId, codigoQr, captura)
     override suspend fun guardarEncuesta(
         eventoId: Long,
         satisfaccion: Int,
@@ -194,7 +173,7 @@ class SyncPassRepository(
                             p.eventoId, AsistenciaRequest(codigoQr = p.codigoQr,
                                 marcadoEn = p.marcadoEn, latitud = p.latitud,
                                 longitud = p.longitud, precisionMetros = p.precisionMetros,
-                                clientUuid = p.clientUuid))
+                                clientUuid = p.clientUuid, ubicacionEn = p.ubicacionEn))
                         PendienteEntity.TIPO_ASISTENCIA_PROPIA,
                         PendienteEntity.TIPO_AUSENCIA_PROPIA -> error(
                             "La automarcación ya no está permitida; presenta tu QR a recepción")

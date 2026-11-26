@@ -96,7 +96,7 @@ Crear y probar controles reales con el backend no sustituye probar errores contr
 - Proyectos/eventos remotos no se administran mediante cola offline; recintos sí es CRUD local.
 - Sincronización periódica sujeta a Android, batería, red y sesión.
 - QR sin firma/caducidad; no protege por sí solo contra copia o suplantación.
-- Ubicación referencial, sin validación obligatoria de distancia en backend.
+- Validación geográfica incorporada con modo inicial `AUDIT`; la activación obligatoria `ENFORCE` y las pruebas reales de clientes/migraciones siguen pendientes. Véase [la feature geográfica](11-GEOLOCALIZACION-ASISTENCIA.md).
 - No existe validación formal de todos los dispositivos, accesibilidad completa o carga masiva.
 - No hay medición del impacto del negocio, SLA ni garantía de tiempos inferiores a cinco segundos.
 - Base local con información que no está cifrada como los tokens; revisar almacenamiento según sensibilidad del uso real.

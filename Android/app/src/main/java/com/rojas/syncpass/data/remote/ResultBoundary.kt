@@ -12,6 +12,7 @@ fun Throwable.toAppError(): AppException = when (this) {
         403 -> AppException(ErrorCode.PERMISO, false, "No tienes permisos para esta operacion", this)
         404 -> AppException(ErrorCode.NO_EXISTE, false, "El registro no existe; actualiza el listado", this)
         409 -> AppException(ErrorCode.CONFLICTO, false, "La operacion entra en conflicto con datos o historial existentes", this)
+        422 -> AppException(ErrorCode.VALIDACION, false, geographicMessage() ?: "El servidor rechazo los datos. Revisa la operacion", this)
         408, 429 -> AppException(ErrorCode.RED, true, "Servicio temporalmente no disponible", this)
         in 500..599 -> AppException(ErrorCode.SERVIDOR, true, "Servicio temporalmente no disponible", this)
         else -> AppException(ErrorCode.VALIDACION, false, "El servidor rechazo los datos. Revisa la operacion", this)

@@ -32,6 +32,7 @@ public class EventoService {
     private final ProyectoService proyectoService;
     private final UsuarioService usuarioService;
     private final EncuestaService encuestaService;
+    private final AttendanceLocationPolicy locationPolicy;
 
     public EventoService(
             EventoRepository eventoRepository,
@@ -39,7 +40,8 @@ public class EventoService {
             AsistenciaRepository asistenciaRepository,
             ProyectoService proyectoService,
             UsuarioService usuarioService,
-            EncuestaService encuestaService
+            EncuestaService encuestaService,
+            AttendanceLocationPolicy locationPolicy
     ) {
         this.eventoRepository = eventoRepository;
         this.inscripcionRepository = inscripcionRepository;
@@ -47,6 +49,7 @@ public class EventoService {
         this.proyectoService = proyectoService;
         this.usuarioService = usuarioService;
         this.encuestaService = encuestaService;
+        this.locationPolicy = locationPolicy;
     }
 
     @Transactional(readOnly = true)
@@ -204,6 +207,8 @@ public class EventoService {
         if (evento.getEstado() == EstadoEvento.CANCELADO || evento.getEstado() == EstadoEvento.FINALIZADO)
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "El evento no admite nuevas asistencias");
 
+        var geographicDecision = locationPolicy.validate(evento, request, Instant.now());
+
         Inscripcion inscripcion = inscripcionRepository.findByEventoIdAndUsuarioId(eventoId, estudianteId)
                 .orElse(null);
         if (inscripcion == null) {
@@ -224,6 +229,9 @@ public class EventoService {
         asistencia.setLatitud(request.latitud());
         asistencia.setLongitud(request.longitud());
         asistencia.setPrecisionMetros(request.precisionMetros());
+        asistencia.setUbicacionEn(request.ubicacionEn());
+        asistencia.setValidacionGeografica(geographicDecision.status());
+        asistencia.setMotivoGeografico(geographicDecision.reason());
         asistencia.setOrigen(OrigenAsistencia.QR);
         if (request.clientUuid() != null && !request.clientUuid().isBlank()) {
             asistencia.setClientUuid(request.clientUuid());

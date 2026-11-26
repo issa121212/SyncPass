@@ -4,7 +4,7 @@
 
 Room es una capa sobre SQLite dentro de Android. Permite consultar caché y persistir datos/pendientes entre aperturas de la app. No es el backend, no reemplaza PostgreSQL y no comparte automáticamente información con otro teléfono.
 
-`AppContainer` y `SyncPassDatabase` seleccionan una base local según la cuenta (issuer/sub). Al cambiar de usuario no deben mezclarse catálogos ni pendientes de cuentas diferentes. Una desinstalación o borrado de datos puede eliminar información exclusivamente local: no es un respaldo del servidor.
+`AccountComponent` de Hilt y `SyncPassDatabase` seleccionan una base local según la cuenta (issuer/sub). Al cambiar de usuario no deben mezclarse catálogos ni pendientes de cuentas diferentes. Una desinstalación o borrado de datos puede eliminar información exclusivamente local: no es un respaldo del servidor.
 
 ## Capacidades concretas
 
@@ -58,4 +58,4 @@ Material 3 proporciona componentes, tema claro/oscuro y tamaños de interacción
 
 ## Ubicación
 
-`UbicacionHelper` consulta la última ubicación conocida si existe permiso, incluyendo precisión cuando está disponible. No fuerza una lectura nueva ni garantiza actualidad absoluta. La API almacena coordenadas referenciales; el código revisado de escaneo no aplica una validación de distancia al radio del evento. Esa diferencia con el objetivo del caso debe conservarse en las limitaciones.
+La selección del evento utiliza un mapa, recintos locales o coordenadas avanzadas. Al escanear un evento con zona, `AndroidLocationSource` obtiene una posición reciente y `ScannerViewModel` verifica precisión y distancia antes de persistirla. La cola conserva la hora de posición y de captura durante los reintentos. El backend incorpora una política geográfica en modos `AUDIT` y `ENFORCE`; el valor predeterminado `AUDIT` mantiene los clientes anteriores y no impone geocerca obligatoria. Véanse las reglas, migraciones y activación en [Validación geográfica de asistencia](11-GEOLOCALIZACION-ASISTENCIA.md).

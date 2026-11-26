@@ -73,6 +73,7 @@ data class PendienteEntity(
     val sincronizado: Boolean = false,
     val error: String? = null,
     @androidx.room.ColumnInfo(defaultValue = "0") val rechazado: Boolean = false,
+    val ubicacionEn: String? = null,
 ) {
     companion object {
         const val TIPO_ASISTENCIA_ESCANEO = "ASISTENCIA_ESCANEO"

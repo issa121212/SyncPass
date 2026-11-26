@@ -45,6 +45,8 @@ aws:
 # Configuración CORS
 # Habilitar/deshabilitar CORS completamente (útil para deshabilitar cuando pasa por API Gateway)
 app:
+  attendance:
+    geo-mode: ${ATTENDANCE_GEO_MODE:AUDIT}
   cors:
     enabled: ${CORS_ENABLED:true}
     allowed-origins: ${CORS_ALLOWED_ORIGINS:}
