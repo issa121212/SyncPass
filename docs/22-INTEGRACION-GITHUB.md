@@ -2,20 +2,20 @@
 
 Se publicaron las doce ramas locales de esta cadena en origin, sin force-push ni cambios en develop/main. Las referencias a trabajo «solo local» de documentos anteriores describen sus etapas de preparación; esta publicación es posterior y fue autorizada por el equipo.
 
-## Primer paso abierto
+## Primer paso integrado
 
 [PR #7: migración a Hilt](https://github.com/issa121212/SyncPass/pull/7), desde `feature/inyeccion-hilt` hacia `develop`.
 
 El PR contiene los tres commits de esa etapa. Su descripción distingue sus 48 pruebas unitarias registradas de las 100 pruebas y 45,22 % de cobertura de la entrega completa. No se atribuye a esta rama inicial una cobertura que todavía depende de cambios posteriores.
 
-El PR queda abierto para revisión; no se fusiona automáticamente. La corrección posterior de restauración de sesión debe integrarse también antes de preparar la release. No se presenta este paso intermedio como el APK final.
+El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La integración se verificó por la API de GitHub y por la ascendencia de los commits. La corrección posterior de restauración de sesión debe integrarse también antes de preparar la release. No se presenta este paso intermedio como el APK final.
 
 ## Orden de las ramas publicadas
 
 | Orden | Rama | Estado al publicar |
 |---|---|---|
-| 1 | feature/inyeccion-hilt | PR #7 abierto hacia develop |
-| 2 | feature/ubicacion-eventos | Publicada; esperar integración anterior |
+| 1 | feature/inyeccion-hilt | PR #7 fusionado en develop |
+| 2 | feature/ubicacion-eventos | PR #8 abierto hacia develop |
 | 3 | feature/geolocalizacion-asistencia | Publicada; esperar integración anterior |
 | 4 | feature/creacion-offline | Publicada; esperar integración anterior |
 | 5 | chore/ensayo-migraciones | Publicada; esperar integración anterior |
@@ -41,3 +41,7 @@ Cada rama contiene a la anterior como ancestro. Se verificó esa relación antes
 8. Preparar release, PR a main, tag y APK final después de la aprobación.
 
 La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviaron comentarios, revisiones ni aprobaciones en nombre del colega.
+
+## Segundo paso abierto
+
+[PR #8: ubicación de eventos](https://github.com/issa121212/SyncPass/pull/8), desde feature/ubicacion-eventos hacia develop. Se verificó que presenta solamente los tres commits de esta etapa, sin repetir la migración a Hilt. Queda pendiente de revisión y fusión manual. Después corresponde feature/geolocalizacion-asistencia.
