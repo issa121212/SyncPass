@@ -99,10 +99,10 @@ Hilt proporciona dependencias mediante módulos y constructores. `AccountCompone
 
 La cola de creaciones se procesa antes que la de inscripciones, asistencias y encuestas. `OfflineCreations` depende de la frontera `CreationStore`; `RoomCreationStore` aplica las transacciones del DAO. `RoomAsistenciasRepository` persiste la evidencia de captura y delega el envío al coordinador. El mismo Mutex coordina sincronización manual y trabajo de fondo.
 
-Estos diagramas describen el código de la entrega local, no acreditan que las nuevas migraciones o políticas estén desplegadas en EC2. La geografía inicia en modo de auditoría compatible; la imposición obligatoria depende de actualizar y verificar todos los clientes.
+Estos diagramas describen la entrega local. El despliegue de V3/V4 y la activación posterior de ENFORCE se registran en [el documento de EC2](17-DESPLIEGUE-BACKEND.md). V5 de códigos públicos sigue siendo una migración local pendiente de despliegue.
 
 
-`AppContainer` construye las dependencias por cuenta. En ejecución, cuando un ViewModel llama a un contrato de dominio, la operación se ejecuta en su repositorio concreto. Compose vuelve a dibujar la interfaz cuando cambia el estado observable.
+`AccountComponent` y `AccountDependencies` construyen y administran las dependencias por cuenta. En ejecución, cuando un ViewModel llama a un contrato de dominio, la operación se ejecuta en su repositorio concreto. Compose vuelve a dibujar la interfaz cuando cambia el estado observable.
 
 ### Vista general del despliegue
 
@@ -185,14 +185,15 @@ No existe un mapper independiente para todo: conversiones como `toResponse` est�
 ## Modelo de datos
 
 - Usuario: identidad local, vínculo Cognito, nombre y roles. Un usuario participa en inscripciones y puede ser responsable de proyectos.
-- Proyecto: nombre, descripción, área temática, unidad vecinal, fechas, estado y responsable. Tiene varios eventos.
-- Evento: proyecto, datos de actividad, LocalDateTime, cupos, ubicación, radio, QR y estado.
+- Proyecto: ID interno, código público único, nombre, descripción, área temática, unidad vecinal, fechas, estado y responsable. Tiene varios eventos.
+- Evento: ID interno, código público único, proyecto, datos de actividad, LocalDateTime, cupos, ubicación, radio, QR y estado.
 - Inscripción: une usuario y evento, con estado y fecha de creación.
 - Asistencia: une usuario y evento, presente, timestamp, origen, ubicación opcional y clientUuid.
 - Encuesta: asociada a asistencia; satisfacción, utilidad, comentarios y fecha.
 - Recinto local: nombre, dirección, coordenadas y radio; no es una entidad de la API.
 - Pendiente local: tipo de operación, evento, UUID, contenido necesario y estado/error de envío; conserva la hora de posición y de captura para asistencia.
 - Creación local: UUID, tipo, payload inmutable, proyecto dependiente, estado/error y correspondencia local-remota.
+- Reserva de código público: código aleatorio con prefijo PRY/EVT, único y no reutilizable; se reserva en la transacción de creación del recurso.
 - Creación de servidor: usuario, tipo, UUID, huella e ID remoto, guardados junto al recurso en una transacción.
 - Evidencia geográfica: hora de posición, estado y motivo de evaluación; los registros históricos pueden carecer de estos campos.
 
@@ -211,3 +212,9 @@ La View envía un formulario al ViewModel. El coordinador valida y guarda una cr
 ## Flujo geográfico de recepción
 
 El receptor lee el QR del participante en un evento confirmado. `ScannerViewModel` obtiene una ubicación reciente mediante `LocationSource`, valida su precisión y margen dentro de la zona y guarda la captura antes de enviarla. El backend vuelve a evaluar con la zona actual mediante `AttendanceLocationPolicy`. `AUDIT` conserva clientes anteriores y registra el resultado; `ENFORCE` rechaza incumplimientos. Los detalles y límites están en [la política geográfica](11-GEOLOCALIZACION-ASISTENCIA.md).
+
+## Presentación del filtro y códigos públicos
+
+HomeViewModel conserva el filtro de estado en SavedStateHandle y deriva eventosVisibles del catálogo del repositorio. Compose muestra resultados y cantidad; el filtro no consulta HTTP ni altera Room. La lista conserva desplazamiento vertical sin paginación.
+
+El backend reserva el código público en PostgreSQL dentro de la misma transacción que crea el recurso. Su respuesta lo incorpora al DTO; los mappers Android lo conservan en Room V6 y dominio. La View lo muestra como dato secundario. Los registros pendientes no generan códigos definitivos en el dispositivo. Véanse los documentos [18](18-FILTRO-ESTADO-EVENTOS.md) y [19](19-CODIGOS-PUBLICOS.md).

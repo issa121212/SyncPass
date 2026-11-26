@@ -1,6 +1,6 @@
 # Documentación de SyncPass
 
-Documentación técnica y funcional de SyncPass Android y su backend compartido. Revisión local: 25-11-2026. Las mejoras documentadas requieren validación de integración y despliegue; no se presume que estén activas en producción.
+Documentación técnica y funcional de SyncPass Android y su backend compartido. Revisión local: 26-11-2026. Las mejoras documentadas requieren validación de integración y despliegue; no se presume que estén activas en producción.
 
 ## Lectura sugerida
 
@@ -22,6 +22,8 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 16. [Revisión visual y validación de zona](15-REVISION-VISUAL.md).
 17. [Restauración de sesión al reabrir](16-RESTAURACION-SESION.md).
 18. [Despliegue del backend en EC2](17-DESPLIEGUE-BACKEND.md).
+19. [Filtro de eventos por estado](18-FILTRO-ESTADO-EVENTOS.md).
+20. [Códigos públicos de proyectos y eventos](19-CODIGOS-PUBLICOS.md).
 
 ## Cómo interpretar el alcance
 
