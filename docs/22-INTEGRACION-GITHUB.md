@@ -24,8 +24,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 8 | fix/restauracion-sesion | PR #14 fusionado en develop |
 | 9 | fix/permiso-camara | PR #15 fusionado en develop |
 | 10 | feature/filtro-estado-eventos | PR #16 fusionado en develop |
-| 11 | feature/codigos-publicos | PR #17 abierto; incluye compatibilidad V6 |
-| 12 | test/cobertura-minima-android | Publicada; incluye verificación mínima y esta guía |
+| 11 | feature/codigos-publicos | PR #17 fusionado; incluye compatibilidad V6 |
+| 12 | test/cobertura-minima-android | PR #18 abierto; último de la cadena |
 
 Cada rama contiene a la anterior como ancestro. Se verificó esa relación antes de publicar. Las ramas locales descartadas de Supabase y de asistencia antigua no forman parte de esta subida.
 
@@ -80,4 +80,10 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Undécimo paso abierto
 
-[PR #17: códigos públicos](https://github.com/issa121212/SyncPass/pull/17), desde feature/codigos-publicos hacia develop. Incluye cinco commits nuevos con Android, Flyway V5/V6 y compatibilidad de recuperación. Queda pendiente de revisión y fusión manual. Después corresponde test/cobertura-minima-android. Fusionar no despliega el backend en EC2.
+[PR #17: códigos públicos](https://github.com/issa121212/SyncPass/pull/17), desde feature/codigos-publicos hacia develop. Incluye cinco commits nuevos con Android, Flyway V5/V6 y compatibilidad de recuperación. El usuario fusionó el PR #17 y se verificó su integración en develop (cc8718b). Fusionar no desplegó el backend en EC2.
+
+## Duodécimo paso abierto
+
+[PR #18: cobertura mínima y documentación](https://github.com/issa121212/SyncPass/pull/18), desde test/cobertura-minima-android hacia develop. Incluye cinco pruebas nuevas de componentes locales, configuración y verificación mínima de 30 % de líneas. La suite local registra 100 pruebas aprobadas y 45,22 % de líneas sin sumar instrumentadas ni excluir archivos del módulo. Incluye también el registro documental de esta secuencia de integración.
+
+Queda pendiente de revisión y fusión manual. Tras fusionarlo corresponde actualizar develop local y validar su compilación, pruebas y cobertura antes del despliegue específico de V5/V6, las pruebas del teléfono y la release.
