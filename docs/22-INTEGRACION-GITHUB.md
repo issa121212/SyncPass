@@ -1,0 +1,43 @@
+# Integración en GitHub · 26-11-2026
+
+Se publicaron las doce ramas locales de esta cadena en origin, sin force-push ni cambios en develop/main. Las referencias a trabajo «solo local» de documentos anteriores describen sus etapas de preparación; esta publicación es posterior y fue autorizada por el equipo.
+
+## Primer paso abierto
+
+[PR #7: migración a Hilt](https://github.com/issa121212/SyncPass/pull/7), desde `feature/inyeccion-hilt` hacia `develop`.
+
+El PR contiene los tres commits de esa etapa. Su descripción distingue sus 48 pruebas unitarias registradas de las 100 pruebas y 45,22 % de cobertura de la entrega completa. No se atribuye a esta rama inicial una cobertura que todavía depende de cambios posteriores.
+
+El PR queda abierto para revisión; no se fusiona automáticamente. La corrección posterior de restauración de sesión debe integrarse también antes de preparar la release. No se presenta este paso intermedio como el APK final.
+
+## Orden de las ramas publicadas
+
+| Orden | Rama | Estado al publicar |
+|---|---|---|
+| 1 | feature/inyeccion-hilt | PR #7 abierto hacia develop |
+| 2 | feature/ubicacion-eventos | Publicada; esperar integración anterior |
+| 3 | feature/geolocalizacion-asistencia | Publicada; esperar integración anterior |
+| 4 | feature/creacion-offline | Publicada; esperar integración anterior |
+| 5 | chore/ensayo-migraciones | Publicada; esperar integración anterior |
+| 6 | test/integracion-android | Publicada; esperar integración anterior |
+| 7 | fix/validacion-visible-zona | Publicada; esperar integración anterior |
+| 8 | fix/restauracion-sesion | Publicada; esperar integración anterior |
+| 9 | fix/permiso-camara | Publicada; esperar integración anterior |
+| 10 | feature/filtro-estado-eventos | Publicada; esperar integración anterior |
+| 11 | feature/codigos-publicos | Publicada; incluye compatibilidad V6 |
+| 12 | test/cobertura-minima-android | Publicada; incluye verificación mínima y esta guía |
+
+Cada rama contiene a la anterior como ancestro. Se verificó esa relación antes de publicar. Las ramas locales descartadas de Supabase y de asistencia antigua no forman parte de esta subida.
+
+## Cómo seguir
+
+1. El colega revisa el PR #7 y deja observaciones o una aprobación real con su propia cuenta.
+2. Resolver las observaciones antes de fusionar.
+3. Usar **Create a merge commit** para integrar esta cadena. Squash/rebase cambiarían la relación entre los commits ya presentes en las ramas siguientes y ampliarían sus comparaciones. Si se elige otra estrategia, hay que reordenar las dependencias antes de continuar.
+4. Actualizar la referencia de develop y abrir el siguiente PR hacia develop. Comprobar que la comparación muestra la etapa nueva, sin repetir cambios integrados.
+5. Repetir revisión e integración en el orden de la tabla. No abrir doce PR acumulativos hacia develop a la vez.
+6. Sobre develop integrado, ejecutar la compilación y `:app:check`, incluida la verificación de 30 % de líneas.
+7. Preparar respaldo y despliegue específico de V5/V6 en EC2, manteniendo ENFORCE, y completar las pruebas físicas y de sincronización.
+8. Preparar release, PR a main, tag y APK final después de la aprobación.
+
+La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviaron comentarios, revisiones ni aprobaciones en nombre del colega.
