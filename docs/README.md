@@ -19,6 +19,7 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 13. [Creación offline, dependencias e idempotencia](12-CREACION-OFFLINE.md).
 14. [Respaldo y ensayo de migraciones](13-ENSAYO-MIGRACIONES.md).
 15. [Integración Android, Room y backend local](14-INTEGRACION-ANDROID.md).
+16. [Revisión visual y validación de zona](15-REVISION-VISUAL.md).
 
 ## Cómo interpretar el alcance
 

@@ -14,6 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,25 +45,30 @@ fun EventLocationDialog(
         onDismissRequest = onDismiss,
         title = { Text("Zona del evento") },
         text = {
-            Column(
-                Modifier.fillMaxWidth().heightIn(max = 440.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text("Toca el mapa para elegir el centro de la zona")
-                EventZoneMap(state.point, state.radius.toIntOrNull()?.takeIf { it in 1..50_000 } ?: 200, vm::selectPoint)
-                OutlinedButton(enabled = !state.locating, onClick = {
-                    if (permissions.any { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }) {
-                        vm.locate()
-                    } else launcher.launch(permissions)
-                }) { Text(if (state.locating) "Obteniendo ubicación…" else "Usar mi ubicación") }
-                state.point?.let { Text("Centro seleccionado: %.5f, %.5f".format(it.latitude, it.longitude)) }
-                state.accuracyMeters?.let { Text("Precisión informada: %.0f m. Revisa el punto antes de confirmar".format(it)) }
-                OutlinedTextField(
-                    value = state.radius, onValueChange = vm::setRadius,
-                    label = { Text("Radio permitido (m)") }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                )
-                state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                state.error?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+                }
+                Column(
+                    Modifier.fillMaxWidth().heightIn(max = 440.dp).verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text("Toca el mapa para elegir el centro de la zona")
+                    EventZoneMap(state.point, state.radius.toIntOrNull()?.takeIf { it in 1..50_000 } ?: 200, vm::selectPoint)
+                    OutlinedButton(enabled = !state.locating, onClick = {
+                        if (permissions.any { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }) {
+                            vm.locate()
+                        } else launcher.launch(permissions)
+                    }) { Text(if (state.locating) "Obteniendo ubicación…" else "Usar mi ubicación") }
+                    state.point?.let { Text("Centro seleccionado: %.5f, %.5f".format(it.latitude, it.longitude)) }
+                    state.accuracyMeters?.let { Text("Precisión informada: %.0f m. Revisa el punto antes de confirmar".format(it)) }
+                    OutlinedTextField(
+                        value = state.radius, onValueChange = vm::setRadius,
+                        label = { Text("Radio permitido (m)") }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
+                }
             }
         },
         confirmButton = {
