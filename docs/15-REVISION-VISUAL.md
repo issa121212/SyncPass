@@ -20,4 +20,4 @@ Se conserva el desplazamiento cuando el tamaño de pantalla, el teclado o la acc
 
 ## Comprobaciones pendientes
 
-Se corrigió la [restauración de sesiones vigentes](16-RESTAURACION-SESION.md) y se comprobó mediante pruebas unitarias. La instalación principal conservaba una sesión antigua vencida; para verificar Cognito real debe iniciarse una nueva sesión en ese paquete y reabrirlo. También quedan los diálogos reales de permisos, cámara física y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
+Se corrigió la [restauración de sesiones vigentes](16-RESTAURACION-SESION.md) y se comprobó mediante pruebas unitarias y una actualización del APK principal después de un login real: la app recuperó el inicio de docente sin pedir otra autenticación. Siguen pendientes logout real, diálogos reales de permisos, cámara física y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
