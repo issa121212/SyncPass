@@ -22,8 +22,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 6 | test/integracion-android | PR #12 fusionado en develop |
 | 7 | fix/validacion-visible-zona | PR #13 fusionado en develop |
 | 8 | fix/restauracion-sesion | PR #14 fusionado en develop |
-| 9 | fix/permiso-camara | PR #15 abierto hacia develop |
-| 10 | feature/filtro-estado-eventos | Publicada; esperar integración anterior |
+| 9 | fix/permiso-camara | PR #15 fusionado en develop |
+| 10 | feature/filtro-estado-eventos | PR #16 abierto hacia develop |
 | 11 | feature/codigos-publicos | Publicada; incluye compatibilidad V6 |
 | 12 | test/cobertura-minima-android | Publicada; incluye verificación mínima y esta guía |
 
@@ -72,4 +72,8 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Noveno paso abierto
 
-[PR #15: recuperación del permiso de cámara](https://github.com/issa121212/SyncPass/pull/15), desde fix/permiso-camara hacia develop. Incluye siete commits nuevos de corrección y documentación operativa. Queda pendiente de revisión y fusión manual. Después corresponde feature/filtro-estado-eventos.
+[PR #15: recuperación del permiso de cámara](https://github.com/issa121212/SyncPass/pull/15), desde fix/permiso-camara hacia develop. Incluye siete commits nuevos de corrección y documentación operativa. El usuario fusionó el PR #15 y se verificó su integración en develop (e000eed).
+
+## Décimo paso abierto
+
+[PR #16: filtro de eventos por estado](https://github.com/issa121212/SyncPass/pull/16), desde feature/filtro-estado-eventos hacia develop. Incluye un commit nuevo y mantiene el catálogo local sin paginación. Queda pendiente de revisión y fusión manual. Después corresponde feature/codigos-publicos.
