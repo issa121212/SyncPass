@@ -16,7 +16,7 @@ Los requisitos siguientes corresponden a las funcionalidades de la entrega. La �
 |---|---|---|---|
 | RF-01 | Usuario con cuenta Cognito | Inicia sesión mediante Hosted UI y regresa a Android | `cognito-auth`, `LoginScreen` |
 | RF-02 | Usuario con sesión | Ve nombre y opciones según roles, y puede cerrar sesión | `SessionStore`, `HomeUiState`, navegación |
-| RF-03 | Docente o ADMIN | Crea y consulta proyectos de negocio mediante HTTP | `ApiProyectosRepository`, `ProyectoService` |
+| RF-03 | Docente o ADMIN | Crea proyectos, también sin conexión, y confirma mediante API | `OfflineCreations`, `ProyectoService`, `CreationIdempotency` |
 | RF-04 | Responsable o ADMIN | Edita proyectos; elimina solo sin eventos asociados | `GestionScreen`, `ProyectoService` |
 | RF-05 | Usuario autenticado | Consulta catálogo y detalle de eventos | `SyncPassRepository`, `EventoController` |
 | RF-06 | Docente responsable o ADMIN | Crea evento asociado a un proyecto permitido | `EventoEditorDialog`, `EventoService` |
@@ -32,6 +32,8 @@ Los requisitos siguientes corresponden a las funcionalidades de la entrega. La �
 | RF-16 | Usuario con datos ya descargados | Consulta copia local; encola inscripción, asistencia y encuesta según operación | Room y `PendienteEntity` |
 | RF-17 | Usuario con conexión y sesión válida | Envía pendientes y distingue errores transitorios de rechazos | `sincronizar`, `SyncWorker` |
 | RF-18 | Usuario que crea o edita evento | Introduce fecha/hora separadas y ve guiones/dos puntos automáticos | `FechaCampo`, `FormatoFechaHora`, `EventoEditorDialog` |
+| RF-19 | Docente o ADMIN con perfil descargado | Crea un evento para un proyecto pendiente y sincroniza padre antes que hijo | `CreationStore`, `OfflineCreations` |
+| RF-20 | Receptor de un evento con zona | Captura ubicación reciente y diferencia pendiente, confirmación y rechazo; backend con transición AUDIT/ENFORCE | `AttendanceLocationPolicy`, `ScannerViewModel` |
 
 La cancelación de una inscripción individual, reportes exportables y administración completa de usuarios no se presentan como funcionalidades entregadas por Android.
 
@@ -65,8 +67,8 @@ La cancelación de una inscripción individual, reportes exportables y administr
 
 ### CU-02 · Gestionar proyectos y eventos
 
-- **Actor:** docente responsable o administrador autorizado. Se requiere conexión y, para el evento, un proyecto permitido.
-- **Flujo:** el docente elige el proyecto, completa los pasos del formulario y guarda. La API valida los datos y permisos. Con la respuesta exitosa, Android actualiza su copia en Room.
+- **Actor:** docente responsable o administrador autorizado. La creación offline requiere un perfil previamente descargado y un proyecto permitido para los eventos.
+- **Flujo:** el docente elige el proyecto, completa el formulario y guarda una solicitud durable. Al sincronizar se envían primero proyectos y después eventos; la API valida permisos y confirma IDs remotos de forma idempotente. La edición y eliminación remotas requieren conexión.
 - **Alternativas:** se puede cancelar el evento y conservar su historial. El servidor rechaza la eliminación si hay historial incompatible. Si falla la red o la validación, se conserva la última versión confirmada en Room.
 - **Trazabilidad:** RF-03 a RF-08, RF-18, RNF-02 y RNF-09.
 
@@ -74,7 +76,7 @@ La cancelación de una inscripción individual, reportes exportables y administr
 
 - **Actor:** docente desde la pantalla de gestión. Puede trabajar con los datos de su cuenta en el dispositivo sin conexión.
 - **Flujo:** abre la sección de recintos, completa los campos y guarda. Room actualiza la lista. Al elegir el recinto en el editor de eventos, se copian sus campos al formulario.
-- **Alternativas:** puede editar o eliminar un recinto local. La creación del evento asociado requiere conexión.
+- **Alternativas:** puede editar o eliminar un recinto local. La creación de un evento copia sus campos y puede quedar pendiente de sincronización.
 - **Trazabilidad:** RF-09, RNF-06, RNF-13.
 
 ### CU-04 · Inscribirse y presentar el QR
@@ -103,6 +105,6 @@ La cancelación de una inscripción individual, reportes exportables y administr
 
 - El caso menciona QR dinámico; el MVP usa identificadores QR legibles y no firmados. No hay caducidad criptográfica ni protección completa contra copia de credenciales.
 - La recepción incorpora comprobación de ubicación, precisión y distancia en Android y backend. El backend inicia en modo `AUDIT` compatible; la geocerca obligatoria requiere activar `ENFORCE` después de actualizar y verificar los clientes. Véase [la política geográfica](11-GEOLOCALIZACION-ASISTENCIA.md).
-- La cola no cubre todo el CRUD y el trabajo periódico no garantiza envío inmediato al volver la señal.
+- La cola admite creación de proyectos/eventos, inscripciones, asistencia y encuestas; no cubre edición/eliminación offline ni garantiza envío inmediato al volver la señal.
 - No se entrega un motor de informes institucionales ni una medición formal del impacto.
 - La paleta puede variar por los colores dinámicos de Android; la consistencia azul observada no es una garantía de color fijo en todos los equipos.

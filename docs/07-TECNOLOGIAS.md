@@ -28,6 +28,10 @@ Versiones tomadas del código revisado, no de recomendaciones de actualización.
 | desugar_jdk_libs | 2.1.5 | Compatibilidad de APIs Java en Android |
 | JUnit | 4.13.2 | Pruebas unitarias |
 | Mockito core | 5.18.0 | Dobles de API/DAO en pruebas |
+| Hilt | 2.60.1 | Inyección por módulos y constructor; dependencias por cuenta y ViewModel |
+| AndroidX Hilt | 1.4.0 | Obtención de ViewModels Hilt en Compose |
+| MapLibre Native | 13.7.1 | Mapa y zona del evento con cartografía OpenFreeMap |
+| Coroutines Test | 1.11.0 | Dispatcher y tiempo controlados en pruebas unitarias |
 | AndroidX Test JUnit | 1.3.0 | Runner/aserciones instrumentadas |
 | Espresso core | 3.7.0 | Soporte de pruebas Android |
 | Compose UI Test | Gestionada por BOM | Interacciones y aserciones sobre composables |

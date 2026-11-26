@@ -64,6 +64,10 @@ El menú Gestionar agrupa las acciones del evento para mantener el detalle legib
 
 Abrir Administrar proyectos y recintos. Crear, editar o eliminar un recinto. No requiere servidor y pertenece a los datos locales de esa cuenta/dispositivo. Al usarlo en un evento se copian sus valores; no se crea un vínculo remoto con una entidad recinto.
 
+### Creaciones offline del docente
+
+Con una sesión y un perfil previamente descargados, el docente puede crear proyectos y eventos sin red. Un evento puede seleccionar un proyecto pendiente. Las tarjetas muestran el estado de envío y sus rechazos; Sincronizar envía primero el proyecto. Los registros locales aún no confirmados son de solo lectura y no permiten recibir asistencia. Para editar o eliminar un registro confirmado se necesita el servidor. Véanse [el flujo y sus límites](12-CREACION-OFFLINE.md).
+
 ## Dashboard estudiante/voluntario
 
 Muestra catálogo y acceso a eventos para recepción. Abrir el evento correcto antes de escanear. La cuenta con VOLUNTARIO no obtiene por ese solo rol los controles docentes de creación o gestión.

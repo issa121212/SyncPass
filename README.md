@@ -16,6 +16,10 @@ El frontend móvil utiliza Kotlin y Jetpack Compose; el backend utiliza Java, Sp
 - Inscripciones, QR del participante, escaneo por recepción y encuestas.
 - Catálogo local y cola de operaciones concretas para trabajo con conectividad intermitente.
 - Fecha y hora separadas con formato automático; editor de eventos en tres pasos.
+- Hilt con dependencias aisladas por cuenta, mapa del evento y validación geográfica de recepción.
+- Creación offline de proyectos y eventos dependientes, con UUID y confirmación idempotente.
+
+Las mejoras locales están documentadas en [Hilt](docs/09-INYECCION-HILT.md), [ubicación](docs/10-UBICACION-EVENTOS.md), [asistencia geográfica](docs/11-GEOLOCALIZACION-ASISTENCIA.md) y [creación offline](docs/12-CREACION-OFFLINE.md). Requieren verificar migraciones y desplegar el backend compatible. La política geográfica inicia en auditoría; la validación obligatoria se activa después de actualizar los clientes.
 
 ## Alcance de esta documentación
 

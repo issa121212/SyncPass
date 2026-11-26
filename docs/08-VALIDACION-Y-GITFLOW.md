@@ -1,5 +1,11 @@
 # Validación, limitaciones, Gitflow y uso de IA
 
+## Validación unitaria de las mejoras locales (25-11-2026)
+
+La suite unitaria final de Android registra 88 pruebas aprobadas. El reporte exclusivo de unitarias cubre 940 de 4825 líneas (19,48 %), incluyendo código generado y UI; no alcanza la meta del 30 %. Se verificaron dependencias Hilt, sesión por cuenta, selección de zona, captura geográfica, creaciones offline, reintentos y sincronización concurrente con fuentes falsas. No se ejecutaron nuevas pruebas instrumentadas ni integraciones de producción. Los resultados combinados anteriores se conservan más abajo como evidencia histórica y no sustituyen esta medición.
+
+La app y el APK de pruebas compilan; lint registra cero errores. Los resultados detallados, comandos y pendientes están en [Creación offline](12-CREACION-OFFLINE.md). Las features locales dependen en orden de Hilt, ubicación, geolocalización de asistencia y creación offline; su integración hacia `develop` y posterior release hacia `main` requiere revisión. No se han publicado estas ramas ni desplegado el backend en esta etapa.
+
 ## Evidencia disponible
 
 Para preparar Android 1.7.0 (versionCode 10) se ejecutaron testDebugUnitTest, lintDebug, assembleDebug y assembleRelease con resultado correcto: 31 pruebas unitarias, sin fallos ni omisiones. Lint conserva advertencias existentes. Se generó una APK debug firmada con la clave de desarrollo y un artefacto release sin firma de distribución; este último debe firmarse antes de instalarlo como release. Las seis pruebas instrumentadas indicadas más abajo corresponden a la validación anterior del CRUD, no a una repetición durante esta preparación.
@@ -93,7 +99,7 @@ Crear y probar controles reales con el backend no sustituye probar errores contr
 
 - No existe renovación persistente de sesión: la caducidad puede requerir volver a Cognito.
 - El primer acceso necesita conexión; no se ofrece disponibilidad absoluta offline.
-- Proyectos/eventos remotos no se administran mediante cola offline; recintos sí es CRUD local.
+- La creación de proyectos/eventos utiliza cola offline; su edición y eliminación remotas siguen requiriendo conexión. Recintos mantiene CRUD local.
 - Sincronización periódica sujeta a Android, batería, red y sesión.
 - QR sin firma/caducidad; no protege por sí solo contra copia o suplantación.
 - Validación geográfica incorporada con modo inicial `AUDIT`; la activación obligatoria `ENFORCE` y las pruebas reales de clientes/migraciones siguen pendientes. Véase [la feature geográfica](11-GEOLOCALIZACION-ASISTENCIA.md).

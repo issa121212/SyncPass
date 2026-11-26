@@ -1,6 +1,6 @@
 # Documentación de SyncPass
 
-Documentación técnica y funcional de la entrega de SyncPass Android y su backend compartido. Fecha de revisión: 30-10-2026.
+Documentación técnica y funcional de SyncPass Android y su backend compartido. Revisión local: 25-11-2026. Las mejoras documentadas requieren validación de integración y despliegue; no se presume que estén activas en producción.
 
 ## Lectura sugerida
 
@@ -16,6 +16,7 @@ Documentación técnica y funcional de la entrega de SyncPass Android y su backe
 10. [Migración a Hilt y dependencias por cuenta](09-INYECCION-HILT.md).
 11. [Selección de ubicación de eventos](10-UBICACION-EVENTOS.md).
 12. [Validación geográfica de asistencia y transición compatible](11-GEOLOCALIZACION-ASISTENCIA.md).
+13. [Creación offline, dependencias e idempotencia](12-CREACION-OFFLINE.md).
 
 ## Cómo interpretar el alcance
 
