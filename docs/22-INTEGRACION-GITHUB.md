@@ -19,8 +19,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 3 | feature/geolocalizacion-asistencia | PR #9 fusionado en develop |
 | 4 | feature/creacion-offline | PR #10 fusionado en develop |
 | 5 | chore/ensayo-migraciones | PR #11 fusionado en develop |
-| 6 | test/integracion-android | PR #12 abierto hacia develop |
-| 7 | fix/validacion-visible-zona | Publicada; esperar integración anterior |
+| 6 | test/integracion-android | PR #12 fusionado en develop |
+| 7 | fix/validacion-visible-zona | PR #13 abierto hacia develop |
 | 8 | fix/restauracion-sesion | Publicada; esperar integración anterior |
 | 9 | fix/permiso-camara | Publicada; esperar integración anterior |
 | 10 | feature/filtro-estado-eventos | Publicada; esperar integración anterior |
@@ -60,4 +60,8 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Sexto paso abierto
 
-[PR #12: integración Android](https://github.com/issa121212/SyncPass/pull/12), desde test/integracion-android hacia develop. Incluye tres commits nuevos con fixtures Room y servidor local de prueba. Queda pendiente de revisión y fusión manual. Después corresponde fix/validacion-visible-zona.
+[PR #12: integración Android](https://github.com/issa121212/SyncPass/pull/12), desde test/integracion-android hacia develop. Incluye tres commits nuevos con fixtures Room y servidor local de prueba. El usuario fusionó el PR #12 y se verificó su integración en develop (c531be2).
+
+## Séptimo paso abierto
+
+[PR #13: validación de zona visible](https://github.com/issa121212/SyncPass/pull/13), desde fix/validacion-visible-zona hacia develop. Incluye un commit nuevo con la corrección visual, prueba instrumentada y documentación. Queda pendiente de revisión y fusión manual. Después corresponde fix/restauracion-sesion.
