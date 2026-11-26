@@ -68,7 +68,7 @@ Desde `Android/`:
 
 Reporte: `Android/app/build/reports/coverage/test/debug/index.html`. Después de agregar las últimas pruebas se ejecutó nuevamente `:app:createDebugUnitTestCoverageReport`; no hubo cambios de producción posteriores. Desde `Backend/`, `gradlew.bat compileJava compileTestJava` comprobó compilación sin ejecutar pruebas ni acceder a producción.
 
-Quedan para integración la migración real de Room, cierre/reapertura del proceso, transacciones y bloqueos de PostgreSQL, dos solicitudes HTTP concurrentes con el mismo UUID y el recorrido Android/web contra el backend desplegado. En esta etapa no se añaden pruebas del backend; se compilan sus fuentes y tests existentes.
+La etapa posterior de [ensayo de migraciones](13-ENSAYO-MIGRACIONES.md) verificó V3/V4 y el arranque de Spring/Hibernate sobre una copia real de PostgreSQL. Quedan para integración la migración real de Room, cierre/reapertura del proceso, bloqueos concurrentes del servicio, dos solicitudes HTTP con el mismo UUID y el recorrido Android/web contra el backend desplegado. No se añadieron pruebas unitarias de negocio del backend; el ensayo operativo es independiente de la suite de Android.
 
 Orden de despliegue: respaldar base y configuración; ensayar V3 y V4 sobre una copia de PostgreSQL y verificar conteos/relaciones; desplegar el backend compatible conservando geografía en AUDIT; comprobar capacidades; instalar Android y ensayar Room 3→4→5 con datos/pendientes anteriores. Verificar un proyecto offline, su evento dependiente y un reintento tras respuesta perdida.
 

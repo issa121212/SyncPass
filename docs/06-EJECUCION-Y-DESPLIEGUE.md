@@ -136,6 +136,8 @@ Cerrar la terminal SSH no detiene el servicio systemd. Detener EC2 o el laborato
 
 ### Actualización del backend
 
+Antes de actualizar, seguir [Respaldo y ensayo de migraciones](13-ENSAYO-MIGRACIONES.md). El ensayo local con copia real verificó V2→V4 y el arranque del nuevo JAR; producción continúa en V2. El script `Backend/deploy/ec2/backup-before-migrations.sh` conserva dump, JAR y configuración en un directorio privado y no aplica migraciones por sí mismo.
+
 Generar el JAR con `bootJar`, transferirlo mediante un canal autorizado, conservar un respaldo, reemplazar el artefacto con permisos de servicio, reiniciar y comprobar health más una operación autenticada. El archivo generado está en `Backend/build/libs/`; su nombre se obtiene del build, no se presupone fijo en cada release. No copiar el código Android a EC2 para ejecutar la app móvil.
 
 ### Certificado y renovación
