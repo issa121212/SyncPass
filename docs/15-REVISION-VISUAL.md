@@ -22,9 +22,9 @@ Se conserva el desplazamiento cuando el tamaño de pantalla, el teclado o la acc
 
 ### Cámara sin permiso
 
-Se abrió el lector desde el detalle de un evento con una cuenta docente. Con el permiso de cámara no concedido, la app mostró «Se necesita acceso a la cámara para leer el código QR» y el botón «Permitir cámara», manteniendo la navegación para volver. No se leyó ningún QR ni se registró una nueva asistencia. La vista previa tras aceptar el permiso y la cámara física siguen pendientes de comprobación; la respuesta al diálogo de privacidad se realiza manualmente.
+Se abrió el lector desde el detalle de un evento con una cuenta docente. Con el permiso de cámara no concedido, la app mostró «Se necesita acceso a la cámara para leer el código QR» y el botón «Permitir cámara», manteniendo la navegación para volver. No se leyó ningún QR ni se registró una nueva asistencia. La recuperación de la vista previa tras conceder el permiso se comprobó posteriormente en el emulador, como se detalla al final. La cámara física sigue pendiente; la respuesta al diálogo de privacidad se realiza manualmente.
 
-Se corrigió la [restauración de sesiones vigentes](16-RESTAURACION-SESION.md) y se comprobó mediante pruebas unitarias y una actualización del APK principal después de un login real: la app recuperó el inicio de docente sin pedir otra autenticación. Siguen pendientes logout real, permiso y ubicación del dispositivo, vista previa tras conceder cámara y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
+Se corrigió la [restauración de sesiones vigentes](16-RESTAURACION-SESION.md) y se comprobó mediante pruebas unitarias y una actualización del APK principal después de un login real: la app recuperó el inicio de docente sin pedir otra autenticación. Siguen pendientes logout real, permiso y ubicación del dispositivo y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
 
 ## Recuperación de cámara bloqueada
 
@@ -32,8 +32,14 @@ Durante la revisión, pulsar «Permitir cámara» no abrió el diálogo. El esta
 
 Se ajustó `QrScannerScreen.kt` para distinguir una solicitud rechazada sin posibilidad de volver a mostrar el diálogo. En ese caso explica el bloqueo y ofrece «Abrir ajustes», que dirige a la información de esta aplicación. Al reanudar la pantalla consulta nuevamente el permiso y permite cargar la cámara si el usuario lo concedió en ajustes. La primera solicitud y el rechazo temporal conservan el flujo normal. La decisión de privacidad sigue siendo manual.
 
-La vista previa y la concesión desde ajustes requieren una comprobación manual posterior a esta corrección. No se cambian permisos mediante comandos ni se registra asistencia para probar este comportamiento.
+La comprobación manual posterior de la concesión desde ajustes y la vista previa se registra a continuación. No se cambian permisos mediante comandos ni se registra asistencia para probar este comportamiento.
 
 Validación de la corrección: compilación e instalación del APK principal correctas, 91 pruebas unitarias aprobadas sin fallos y lint completado sin errores. Estas pruebas no sustituyen la comprobación manual del permiso del sistema y la vista previa.
 
-Comprobación visual posterior: con la sesión docente se abrió el lector desde un evento programado. La pantalla mostró el aviso de permiso bloqueado y el botón «Abrir ajustes», confirmando que ya no ofrece repetir una solicitud que Android descarta. El permiso seguía denegado; la vista previa continúa pendiente de concesión manual.
+Comprobación visual posterior: con la sesión docente se abrió el lector desde un evento programado. La pantalla mostró el aviso de permiso bloqueado y el botón «Abrir ajustes», confirmando que ya no ofrece repetir una solicitud que Android descarta. En ese momento el permiso seguía denegado; la concesión manual se comprobó posteriormente.
+
+### Vista previa recuperada al volver de ajustes
+
+Después de que el usuario concediera el permiso manualmente, Android informó `CAMERA: granted=true`. Al volver al lector se observó la escena virtual de la cámara del Pixel 10 emulado y el texto «Apunta la cámara al código QR», sin repetir la autenticación ni reiniciar la aplicación. Se cerró la ayuda inicial del emulador y se volvió al detalle del evento mediante la flecha de navegación.
+
+Esto comprueba la recuperación del permiso y la vista previa en el emulador. No se presentó ningún QR, no se registró asistencia ni se modificó el evento. La lectura con cámara física y la geolocalización del dispositivo siguen pendientes.
