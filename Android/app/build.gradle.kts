@@ -1,5 +1,7 @@
 import java.util.Properties
+import java.util.Locale
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
 // On a fresh extraction the IDE configures Gradle before Before Launch can copy .env.
 // The example contains PUBLIC endpoints/client identifiers, never tokens or secrets.
@@ -41,7 +43,32 @@ jacoco {
     toolVersion = "0.8.14"
 }
 
+tasks.withType<Test>().configureEach {
+    extensions.configure<JacocoTaskExtension> {
+        // Robolectric carga las clases de la app sin ubicación de código fuente.
+        isIncludeNoLocationClasses = true
+    }
+}
+
 android {
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.jvmArgs(
+                    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                    "--add-opens=java.base/java.util=ALL-UNNAMED",
+                    "--add-opens=java.base/java.io=ALL-UNNAMED",
+                    "--add-opens=java.base/java.net=ALL-UNNAMED",
+                    "--add-opens=java.base/java.security=ALL-UNNAMED",
+                    "--add-opens=java.base/java.text=ALL-UNNAMED",
+                    "--add-opens=java.base/jdk.internal.access=ALL-UNNAMED",
+                    "--add-opens=java.desktop/java.awt.font=ALL-UNNAMED",
+                    "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                )
+            }
+        }
+    }
     namespace = "com.rojas.syncpass"
     compileSdk {
         version = release(37)
@@ -93,6 +120,7 @@ android {
 }
 
 dependencies {
+    testImplementation(libs.robolectric)
     implementation(libs.maplibre.android)
     implementation(libs.hilt.android)
     implementation(libs.hilt.viewmodel.compose)
@@ -143,6 +171,35 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.mlkit.barcode.scanning)
 }
+
+val verifyDebugUnitTestCoverage = tasks.register("verifyDebugUnitTestCoverage") {
+    group = "verification"
+    description = "Exige al menos 30 % de líneas en la suite local JUnit, sin cobertura instrumentada."
+    dependsOn("createDebugUnitTestCoverageReport")
+    val report = layout.buildDirectory.file("reports/coverage/test/debug/report.xml")
+    inputs.file(report)
+    inputs.property("minimumLineCoveragePercent", 30)
+    doLast {
+        val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance().apply {
+            setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+            setFeature("http://xml.org/sax/features/external-general-entities", false)
+            setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+        }
+        val root = factory.newDocumentBuilder().parse(report.get().asFile).documentElement
+        val counter = (0 until root.childNodes.length).mapNotNull {
+            root.childNodes.item(it) as? org.w3c.dom.Element
+        }.single { it.tagName == "counter" && it.getAttribute("type") == "LINE" }
+        val covered = counter.getAttribute("covered").toLong()
+        val total = covered + counter.getAttribute("missed").toLong()
+        check(total > 0 && covered * 100 >= total * 30) {
+            "Cobertura local insuficiente: $covered/$total líneas. Mínimo requerido: 30 %."
+        }
+        logger.lifecycle("Cobertura local JUnit: {} % ({}/{} líneas); mínimo: 30 %.",
+            String.format(Locale.ROOT, "%.2f", covered * 100.0 / total), covered, total)
+    }
+}
+
+tasks.named("check") { dependsOn(verifyDebugUnitTestCoverage) }
 
 kotlin {
     compilerOptions {
