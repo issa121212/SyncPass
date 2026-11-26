@@ -51,3 +51,18 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// Ensayo operativo optativo: no forma parte del JAR ni de la suite unitaria.
+sourceSets {
+    migrationRehearsal {
+        java.srcDir 'deploy/rehearsal/java'
+        compileClasspath += sourceSets.main.runtimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+tasks.register('migrationRehearsal', JavaExec) {
+    group = 'verification'
+    description = 'Ensaya respaldo/restauración y Flyway sobre PostgreSQL local aislado.'
+    classpath = sourceSets.migrationRehearsal.runtimeClasspath
+    mainClass = 'com.duoc.cursos.rehearsal.MigrationRehearsal'
+}
