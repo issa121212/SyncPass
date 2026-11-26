@@ -21,30 +21,42 @@ class SessionViewModel @Inject constructor(
     val owner = _owner.asStateFlow()
     private var accessToken: String? = null
 
+    init {
+        if (sessionStore.hasValidSession()) {
+            sessionStore.tokens.value?.let(::activate)
+        }
+    }
+
     fun open(tokens: CognitoTokens) {
         if (accessToken == tokens.accessToken && _owner.value != null) return
         sessionStore.save(tokens)
         release()
+        activate(tokens)
+    }
+
+    private fun activate(tokens: CognitoTokens) {
         accessToken = tokens.accessToken
         _owner.value = object : ViewModelStoreOwner {
             override val viewModelStore = ViewModelStore()
         }
     }
 
+    fun idTokenForLogout(): String? = sessionStore.currentIdToken()
+
     fun close() {
         sessionStore.clear()
         release()
     }
 
-    private fun release() {
+    private fun release(clearAccount: Boolean = true) {
         _owner.value?.viewModelStore?.clear()
         _owner.value = null
         accessToken = null
-        accounts.clear()
+        if (clearAccount) accounts.clear()
     }
 
     override fun onCleared() {
-        release()
+        release(clearAccount = false)
         super.onCleared()
     }
 }

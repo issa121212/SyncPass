@@ -1,6 +1,6 @@
 # Revisión visual de Android
 
-Se revisó la aplicación actualizada en Pixel 10 emulado con una sesión real de docente iniciada manualmente por el usuario. No se compartieron contraseñas y no se guardaron proyectos, eventos ni asistencias de prueba en producción.
+Se revisó el inicio visible de docente en Pixel 10 emulado. No se compartieron contraseñas y no se guardaron proyectos, eventos ni asistencias de prueba en producción. La comprobación de sesión vigente en el paquete principal se distingue de la inspección visual, pues coexistían una instalación principal y una de validación con el mismo nombre.
 
 ## Comprobaciones
 
@@ -20,4 +20,8 @@ Se conserva el desplazamiento cuando el tamaño de pantalla, el teclado o la acc
 
 ## Comprobaciones pendientes
 
-La revisión de reapertura tras actualizar detectó que el inicio no recuperaba la sesión persistida. Se revisará la restauración en `SessionViewModel` antes de pedir un nuevo login. También quedan los diálogos reales de permisos, cámara física y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
+### Cámara sin permiso
+
+Se abrió el lector desde el detalle de un evento con una cuenta docente. Con el permiso de cámara no concedido, la app mostró «Se necesita acceso a la cámara para leer el código QR» y el botón «Permitir cámara», manteniendo la navegación para volver. No se leyó ningún QR ni se registró una nueva asistencia. La vista previa tras aceptar el permiso y la cámara física siguen pendientes de comprobación; la respuesta al diálogo de privacidad se realiza manualmente.
+
+Se corrigió la [restauración de sesiones vigentes](16-RESTAURACION-SESION.md) y se comprobó mediante pruebas unitarias y una actualización del APK principal después de un login real: la app recuperó el inicio de docente sin pedir otra autenticación. Siguen pendientes logout real, permiso y ubicación del dispositivo, vista previa tras conceder cámara y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).

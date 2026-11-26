@@ -20,6 +20,7 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 14. [Respaldo y ensayo de migraciones](13-ENSAYO-MIGRACIONES.md).
 15. [Integración Android, Room y backend local](14-INTEGRACION-ANDROID.md).
 16. [Revisión visual y validación de zona](15-REVISION-VISUAL.md).
+17. [Restauración de sesión al reabrir](16-RESTAURACION-SESION.md).
 
 ## Cómo interpretar el alcance
 

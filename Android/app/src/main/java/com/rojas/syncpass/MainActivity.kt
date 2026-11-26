@@ -106,8 +106,9 @@ class MainActivity : ComponentActivity() {
                         CompositionLocalProvider(LocalViewModelStoreOwner provides owner) {
                             SyncPassApp(
                                 onLogout = {
+                                    val idToken = sessionVm.idTokenForLogout()
                                     sessionVm.close()
-                                    cognitoVm.startLogout()
+                                    cognitoVm.startLogout(idToken)
                                 },
                             )
                         }
