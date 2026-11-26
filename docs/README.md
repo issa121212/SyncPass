@@ -24,6 +24,7 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 18. [Despliegue del backend en EC2](17-DESPLIEGUE-BACKEND.md).
 19. [Filtro de eventos por estado](18-FILTRO-ESTADO-EVENTOS.md).
 20. [Códigos públicos de proyectos y eventos](19-CODIGOS-PUBLICOS.md).
+21. [Revisión previa a integración](20-REVISION-PREINTEGRACION.md).
 
 ## Cómo interpretar el alcance
 

@@ -17,6 +17,7 @@ Las solicitudes no incorporan un campo editable de código. Solo las respuestas 
 ## Migraciones y clientes
 
 - Flyway V5 agrega las reservas y las columnas, asigna códigos aleatorios a los registros existentes con reintento de colisiones, y luego establece NOT NULL, UNIQUE y claves foráneas. No modifica las migraciones ya aplicadas ni los datos anteriores.
+- Flyway V6 agrega generación por defecto para INSERT de un backend anterior, permitiendo recuperar el JAR V4 probado sin perder la capacidad de crear recursos. No modifica V5.
 - Room pasa de V5 a V6 con dos columnas TEXT opcionales. No destruye tablas, caché, sesiones ni colas. Las cadenas desde V1/V3 se completan con la migración nueva.
 - DTO, entidades, modelos y mappers Android conservan el código de extremo a extremo.
 - Una creación sin conexión no inventa un código: muestra «Código pendiente de sincronización» hasta recibir la respuesta del servidor. Una creación rechazada sin código muestra «Código no asignado».
@@ -44,4 +45,8 @@ También pasaron las 12 regresiones existentes seleccionadas de backend (CRUD de
 
 La rama `feature/codigos-publicos` depende de `feature/filtro-estado-eventos`, que a su vez depende de la cadena local de mejoras anterior. Deben integrarse esas dependencias en develop antes de preparar la entrega a main. No se reescribe la historia ni se publica ninguna rama automáticamente.
 
-No se despliega V5 en EC2 ni se actualiza el teléfono como parte de esta implementación. EC2 permanece con el backend anterior de esta sesión, Flyway V4 y geolocalización ENFORCE. El respaldo y despliegue de V5 requieren una operación posterior, tras revisar el resultado local. El APK principal actualizado se instaló en el emulador conservando sus datos. La sesión estaba cerrada al inspeccionarlo: la revisión interactiva con Cognito requiere login manual. La interfaz con datos ficticios se comprobó mediante la prueba Compose. La validación física de esta nueva interfaz y una prueba de carga masiva de códigos no se han ejecutado.
+No se despliegan V5/V6 en EC2 ni se actualiza el teléfono como parte de esta implementación. EC2 permanece con el backend anterior de esta sesión, Flyway V4 y geolocalización ENFORCE. El respaldo y despliegue de V5/V6 requieren una operación posterior, tras revisar el resultado local. El APK principal actualizado se instaló en el emulador conservando sus datos. La sesión estaba cerrada al inspeccionarlo: la revisión interactiva con Cognito requiere login manual. La interfaz con datos ficticios se comprobó mediante la prueba Compose. La validación física de esta nueva interfaz y una prueba de carga masiva de códigos no se han ejecutado.
+
+## Revisión posterior
+
+La revisión interactiva, las correcciones del despliegue histórico y la comprobación de recuperación del JAR anterior con V6 se describen en [Revisión previa a integración](20-REVISION-PREINTEGRACION.md). La inspección posterior encontró una sesión activa de estudiante en el emulador y permitió verificar el filtro con el catálogo real; las referencias anteriores a sesión cerrada describen el momento de instalación.
