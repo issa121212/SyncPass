@@ -27,6 +27,7 @@ Versiones tomadas del código revisado, no de recomendaciones de actualización.
 | ML Kit barcode-scanning | 17.3.0 | Lectura de QR |
 | desugar_jdk_libs | 2.1.5 | Compatibilidad de APIs Java en Android |
 | JUnit | 4.13.2 | Pruebas unitarias |
+| Robolectric | 4.18 | Android simulado para pruebas locales JUnit de componentes Room; solo dependencia de pruebas |
 | Mockito core | 5.18.0 | Dobles de API/DAO en pruebas |
 | Hilt | 2.60.1 | Inyección por módulos y constructor; dependencias por cuenta y ViewModel |
 | AndroidX Hilt | 1.4.0 | Obtención de ViewModels Hilt en Compose |

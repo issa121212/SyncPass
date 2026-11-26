@@ -1,8 +1,14 @@
 # Validación, limitaciones, Gitflow y uso de IA
 
-## Validación unitaria de las mejoras locales (25-11-2026)
+## Medición local actual (26-11-2026)
 
-La suite unitaria final de Android registra 88 pruebas aprobadas. El reporte exclusivo de unitarias cubre 940 de 4825 líneas (19,48 %), incluyendo código generado y UI; no alcanza la meta del 30 %. Se verificaron dependencias Hilt, sesión por cuenta, selección de zona, captura geográfica, creaciones offline, reintentos y sincronización concurrente con fuentes falsas. No se ejecutaron nuevas pruebas instrumentadas ni integraciones de producción. Los resultados combinados anteriores se conservan más abajo como evidencia histórica y no sustituyen esta medición.
+La suite local JUnit de Android :app registra 100 pruebas aprobadas: 95 unitarias previas y cinco de componentes Room con Android simulado mediante Robolectric. El reporte exclusivo de esa suite mide **2.248 de 4.971 líneas (45,22 %)**, sin sumar las pruebas instrumentadas ni excluir archivos de aplicación. Se supera el mínimo de 30 % de líneas; ramas registra 28,96 % y no alcanza ese porcentaje.
+
+La tarea verifyDebugUnitTestCoverage exige el mínimo y está conectada a :app:check. Alcance, casos nuevos, comandos y límites se detallan en [Cobertura mínima Android](21-COBERTURA-MINIMA-ANDROID.md). Las mediciones siguientes son históricas y no sustituyen esta cifra.
+
+## Validación histórica de las mejoras locales (25-11-2026)
+
+La suite unitaria de esa etapa registró 88 pruebas aprobadas. El reporte exclusivo de unitarias cubre 940 de 4825 líneas (19,48 %), incluyendo código generado y UI; no alcanza la meta del 30 %. Se verificaron dependencias Hilt, sesión por cuenta, selección de zona, captura geográfica, creaciones offline, reintentos y sincronización concurrente con fuentes falsas. No se ejecutaron nuevas pruebas instrumentadas ni integraciones de producción. Los resultados combinados anteriores se conservan más abajo como evidencia histórica y no sustituyen esta medición.
 
 La app y el APK de pruebas compilan; lint registra cero errores. Los resultados detallados, comandos y pendientes están en [Creación offline](12-CREACION-OFFLINE.md). Las features locales dependen en orden de Hilt, ubicación, geolocalización de asistencia y creación offline; su integración hacia `develop` y posterior release hacia `main` requiere revisión. No se han publicado estas ramas ni desplegado el backend en esta etapa.
 
@@ -27,7 +33,7 @@ La validación combina revisión de código, pruebas automatizadas y comprobacio
 
 Las pruebas del CRUD verifican comportamiento y persistencia. La cobertura se mide por separado con JaCoCo.
 
-## Cobertura Android con JaCoCo
+## Cobertura histórica combinada Android con JaCoCo
 
 El reporte combinado mide la variante `debug` del módulo Android `:app`. Reúne las pruebas unitarias y las pruebas instrumentadas de interfaz, Room y sesión. La tarea usa los datos de ejecución de ambas suites para contar cada línea cubierta una sola vez.
 
