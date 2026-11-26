@@ -191,7 +191,7 @@ fun HomeScreen(
     }
     if (mostrarEvento) {
         EventoDialog(
-            proyectos = state.proyectos.filter { com.rojas.syncpass.domain.model.puedeGestionarProyecto(it, state.perfil) },
+            proyectos = state.proyectos.filter { it.syncState != "RECHAZADO" && com.rojas.syncpass.domain.model.puedeGestionarProyecto(it, state.perfil) },
             recintos = state.recintos,
             onDismiss = { mostrarEvento = false },
             onGuardar = onCrearEvento,
@@ -233,9 +233,10 @@ private fun Encabezado(
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(
-                if (state.pendientes == 0) "Todo sincronizado" else "${state.pendientes} operaciones pendientes",
+                if (state.pendientes == 0 && state.totalRechazadas == 0) "Todo sincronizado"
+                else "${state.pendientes} pendientes · ${state.totalRechazadas} rechazadas",
                 style = MaterialTheme.typography.bodySmall,
-                color = if (state.pendientes == 0) {
+                color = if (state.pendientes == 0 && state.totalRechazadas == 0) {
                     MaterialTheme.colorScheme.onPrimaryContainer
                 } else {
                     MaterialTheme.colorScheme.error
@@ -246,8 +247,8 @@ private fun Encabezado(
                     Button(onClick = onQrClick) { Text("Mi QR") }
                 }
                 if (state.esDocente) {
-                    Button(onClick = onNuevoProyecto) { Text("Nuevo proyecto") }
-                    OutlinedButton(onClick = onNuevoEvento) { Text("Nuevo evento") }
+                    Button(onClick = onNuevoProyecto, enabled = !state.creando) { Text("Nuevo proyecto") }
+                    OutlinedButton(onClick = onNuevoEvento, enabled = !state.creando) { Text("Nuevo evento") }
                 }
             }
         }
@@ -257,7 +258,7 @@ private fun Encabezado(
 @Composable
 private fun EventoCard(evento: Evento, esDocente: Boolean, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth().clickable(enabled = evento.id > 0, onClick = onClick),
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(
@@ -270,6 +271,10 @@ private fun EventoCard(evento: Evento, esDocente: Boolean, onClick: () -> Unit) 
                     Text(evento.proyectoNombre, style = MaterialTheme.typography.bodySmall)
                 }
                 EstadoChip(evento.estado)
+            }
+            if (evento.syncState != "CONFIRMADO") {
+                Text("${evento.syncState}: ${evento.syncError ?: "Se enviará al sincronizar"}", style = MaterialTheme.typography.bodySmall)
+                evento.descripcion?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             }
             Text(FechaUtils.mostrar(evento.fechaHora), style = MaterialTheme.typography.bodyMedium)
             val lugar = listOfNotNull(evento.recinto, evento.direccion).joinToString(" · ")
@@ -306,6 +311,7 @@ private fun ProyectoCard(proyecto: Proyecto) {
                 Text("Responsable: ${proyecto.responsableNombre}", style = MaterialTheme.typography.bodySmall)
             }
             EstadoChip(proyecto.estado)
+            if (proyecto.syncState != "CONFIRMADO") Text("${proyecto.syncState}: ${proyecto.syncError ?: "Se enviará al sincronizar"}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

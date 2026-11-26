@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 val estadosEvento = listOf("PROGRAMADO", "EN_CURSO", "FINALIZADO", "CANCELADO")
 
 fun EventoInput.validar() {
-    require(proyectoId > 0) { "Selecciona un proyecto" }
+    require(proyectoId != 0L) { "Selecciona un proyecto" }
     require(nombre.isNotBlank() && nombre.trim().length <= 160) { "Nombre obligatorio, máximo 160 caracteres" }
     require((descripcion?.length ?: 0) <= 4000) { "Descripción: máximo 4000 caracteres" }
     require(runCatching { LocalDateTime.parse(fechaHora) }.isSuccess) { "Fecha y hora inválidas" }

@@ -11,8 +11,8 @@ Room es una capa sobre SQLite dentro de Android. Permite consultar caché y pers
 | Información/acción | Persistencia | Conectividad |
 |---|---|---|
 | Catálogo de proyectos/eventos y perfil | Caché Room de respuestas remotas | Consulta local después de descarga; actualizar requiere red |
-| CRUD de proyectos | API y actualización de caché | Requiere servidor; no existe cola de creación masiva offline |
-| Crear/editar/eliminar/cancelar evento | API y caché confirmada | Requiere conexión con el servidor |
+| Crear proyectos y eventos | Cola durable y registros locales; confirmación por API | Admite creación sin conexión y eventos de proyectos pendientes |
+| Editar/eliminar proyectos y editar/eliminar/cancelar eventos confirmados | API y caché confirmada | Requiere conexión con el servidor |
 | CRUD de recintos | Room | Funciona localmente |
 | Inscripción | API; en fallos reintentables, pendiente local | La aceptación remota depende de cupos/estado al sincronizar |
 | Escaneo de asistencia | Cola local antes de enviar, luego API | La captura puede quedar pendiente; no equivale a confirmada |
@@ -22,9 +22,9 @@ Room es una capa sobre SQLite dentro de Android. Permite consultar caché y pers
 
 ## Actualizar frente a Sincronizar
 
-Actualizar descarga perfil, proyectos y eventos del backend y renueva la caché. Si el servidor falla, conserva lo descargado y muestra el error. No sube supuestos proyectos locales que nunca fueron creados en la API.
+Actualizar descarga perfil, proyectos y eventos del backend y renueva la caché remota conservando las creaciones locales pendientes o rechazadas. Si el servidor falla, conserva lo descargado y muestra el error. Sincronizar es la acción que procesa las solicitudes locales.
 
-Sincronizar procesa la cola de inscripciones, asistencias y encuestas. El repositorio prioriza inscripción, luego asistencia y finalmente encuesta. Usa un Mutex para evitar procesamiento concurrente en las rutas protegidas. Las inscripciones se vuelven a enviar de forma idempotente y la asistencia utiliza clientUuid para reconocer reintentos.
+Sincronizar procesa primero creaciones de proyectos y eventos, respetando dependencias; después inscripciones, asistencias y encuestas. Usa un Mutex por cuenta para coordinar sincronización manual y trabajo de fondo. Las creaciones y asistencias conservan su UUID en los reintentos. Véase [Creación offline](12-CREACION-OFFLINE.md).
 
 Los errores de red, 408, 429 y 5xx se consideran reintentables. Los errores de negocio se marcan rechazados y se conservan para informar al usuario; una sesión inválida exige resolver la autenticación. Si una operación de un evento falla, no se continúa indiscriminadamente con operaciones dependientes del mismo evento durante ese recorrido.
 

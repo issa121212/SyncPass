@@ -24,6 +24,7 @@ class AttendancePersistenceTest {
         override suspend fun encolar(item: PendienteEntity) { rows[item.clientUuid] = item }
         override suspend fun operacion(uuid: String) = rows[uuid]
         override suspend fun pendientes() = rows.values.filter { !it.sincronizado && !it.rechazado }
+        override suspend fun creacionesPendientes() = emptyList<CreationEntity>()
         override suspend fun marcarError(uuid: String, error: String) { rows[uuid] = rows.getValue(uuid).copy(error = error) }
         override suspend fun marcarRechazado(uuid: String, error: String) { rows[uuid] = rows.getValue(uuid).copy(rechazado = true, error = error) }
         override suspend fun marcarSincronizado(uuid: String) { rows[uuid] = rows.getValue(uuid).copy(sincronizado = true) }

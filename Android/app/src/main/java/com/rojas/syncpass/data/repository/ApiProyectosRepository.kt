@@ -11,6 +11,6 @@ class ApiProyectosRepository(private val api: SyncPassApi, private val dao: Sync
         val entity = api.proyecto(id).toEntity(); dao.actualizarProyecto(entity); entity.toDomain()
     }
     override suspend fun crearProyecto(request: ProyectoInput): Result<Unit> = resultado { dao.actualizarProyecto(api.crearProyecto(request.toRequest()).toEntity()) }
-    override suspend fun editarProyecto(id: Long, request: ProyectoInput): Result<Unit> = resultado { dao.actualizarProyecto(api.editarProyecto(id, request.toRequest()).toEntity()) }
-    override suspend fun eliminarProyecto(id: Long): Result<Unit> = resultado { api.eliminarProyecto(id); dao.eliminarProyecto(id) }
+    override suspend fun editarProyecto(id: Long, request: ProyectoInput): Result<Unit> = resultado { require(id > 0) { "Espera la confirmación del proyecto antes de editar" }; dao.actualizarProyecto(api.editarProyecto(id, request.toRequest()).toEntity()) }
+    override suspend fun eliminarProyecto(id: Long): Result<Unit> = resultado { require(id > 0) { "La creación local todavía no está confirmada" }; api.eliminarProyecto(id); dao.eliminarProyecto(id) }
 }

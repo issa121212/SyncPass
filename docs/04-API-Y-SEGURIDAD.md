@@ -2,6 +2,8 @@
 
 ## Evolución de la recepción geográfica
 
+Las creaciones de proyectos y eventos admiten `clientUuid` opcional. Android comprueba `GET /api/sync/capabilities` antes de enviar su cola de creaciones. El backend conserva una operación idempotente por usuario, tipo y UUID en la misma transacción del recurso. Véase [el contrato offline](12-CREACION-OFFLINE.md).
+
 La recepción y la sincronización admiten `ubicacionEn` opcional junto con los campos geográficos existentes. En eventos con zona, `AttendanceLocationPolicy` evalúa distancia, precisión y tiempos antes de escribir nuevas asistencias. El modo inicial `AUDIT` conserva clientes anteriores; `ENFORCE` convierte incumplimientos en HTTP 422 con códigos `GEO_*`. No cambia la autenticación ni los permisos por rol. Véase [contrato, reglas y despliegue compatible](11-GEOLOCALIZACION-ASISTENCIA.md).
 
 Fuente del contrato: `Backend/src/main/java/com/duoc/cursos/controller/`, `dto/ApiDtos.java` y servicios. Base pública configurada: `https://yw4llkw0lb.execute-api.us-east-1.amazonaws.com/`.

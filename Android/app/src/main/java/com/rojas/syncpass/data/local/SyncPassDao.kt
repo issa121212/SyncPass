@@ -22,7 +22,7 @@ interface SyncPassDao {
     @Query("SELECT * FROM perfil WHERE id = 1")
     fun observarPerfil(): Flow<PerfilEntity?>
 
-    @Query("SELECT COUNT(*) FROM pendientes WHERE sincronizado = 0 AND rechazado = 0")
+    @Query("SELECT (SELECT COUNT(*) FROM pendientes WHERE sincronizado = 0 AND rechazado = 0) + (SELECT COUNT(*) FROM creaciones WHERE estado = 'PENDIENTE')")
     fun observarPendientes(): Flow<Int>
 
     @Query("SELECT * FROM pendientes WHERE sincronizado = 0 AND rechazado = 0 ORDER BY creadoEn")
@@ -73,10 +73,10 @@ interface SyncPassDao {
         actualizarNombreProyecto(item.id, item.nombre)
     }
 
-    @Query("DELETE FROM proyectos")
+    @Query("DELETE FROM proyectos WHERE id > 0")
     suspend fun limpiarProyectos()
 
-    @Query("DELETE FROM eventos")
+    @Query("DELETE FROM eventos WHERE id > 0")
     suspend fun limpiarEventos()
 
     @Query("UPDATE eventos SET inscrito = 1 WHERE id = :eventoId")
@@ -132,5 +132,76 @@ interface SyncPassDao {
         limpiarEventos()
         guardarEventos(items)
         reaplicarPendientes()
+    }
+
+    @Query("SELECT * FROM proyectos WHERE id = :id")
+    suspend fun proyectoLocal(id: Long): ProyectoEntity?
+
+    @Query("SELECT * FROM eventos WHERE id = :id")
+    suspend fun eventoLocal(id: Long): EventoEntity?
+
+    @Query("SELECT * FROM perfil WHERE id = 1")
+    suspend fun perfilLocal(): PerfilEntity?
+
+    @Insert
+    suspend fun insertarCreacion(item: CreationEntity): Long
+
+    @Query("SELECT * FROM creaciones WHERE estado = 'PENDIENTE' ORDER BY id")
+    suspend fun creacionesPendientes(): List<CreationEntity>
+
+    @Query("SELECT * FROM creaciones WHERE id = :id")
+    suspend fun creacion(id: Long): CreationEntity?
+
+    @Query("UPDATE creaciones SET remoteId = :remoteId, estado = :estado, error = :error WHERE id = :id")
+    suspend fun estadoCreacion(id: Long, estado: String, remoteId: Long? = null, error: String? = null)
+
+    @Query("UPDATE proyectos SET syncState = :estado, syncError = :error WHERE id = :id")
+    suspend fun estadoProyecto(id: Long, estado: String, error: String?)
+
+    @Query("UPDATE eventos SET syncState = :estado, syncError = :error WHERE id = :id")
+    suspend fun estadoEvento(id: Long, estado: String, error: String?)
+
+    @Query("UPDATE eventos SET proyectoId = :remoteId, proyectoNombre = :nombre WHERE proyectoId = :localId")
+    suspend fun reasignarEventos(localId: Long, remoteId: Long, nombre: String)
+
+    @Query("UPDATE creaciones SET proyectoId = :remoteId WHERE proyectoId = :localId")
+    suspend fun reasignarCreaciones(localId: Long, remoteId: Long)
+
+    @Transaction
+    suspend fun encolarProyecto(creation: CreationEntity, item: ProyectoEntity): Long {
+        val id = insertarCreacion(creation)
+        guardarProyectos(listOf(item.copy(id = -id)))
+        return id
+    }
+
+    @Transaction
+    suspend fun encolarEvento(creation: CreationEntity, item: EventoEntity): Long {
+        val id = insertarCreacion(creation)
+        guardarEvento(item.copy(id = -id))
+        return id
+    }
+
+    @Transaction
+    suspend fun confirmarProyecto(id: Long, remote: ProyectoEntity) {
+        guardarProyectos(listOf(remote))
+        reasignarEventos(-id, remote.id, remote.nombre)
+        reasignarCreaciones(-id, remote.id)
+        eliminarProyecto(-id)
+        estadoCreacion(id, "CONFIRMADO", remote.id)
+    }
+
+    @Transaction
+    suspend fun confirmarEvento(id: Long, remote: EventoEntity) {
+        guardarEvento(remote)
+        eliminarEvento(-id)
+        estadoCreacion(id, "CONFIRMADO", remote.id)
+    }
+
+    @Transaction
+    suspend fun errorCreacion(item: CreationEntity, definitivo: Boolean, message: String) {
+        val state = if (definitivo) "RECHAZADO" else "PENDIENTE"
+        estadoCreacion(item.id, state, error = message)
+        if (item.tipo == "PROYECTO") estadoProyecto(-item.id, state, message)
+        else estadoEvento(-item.id, state, message)
     }
 }

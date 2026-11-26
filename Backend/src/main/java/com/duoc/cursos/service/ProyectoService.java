@@ -20,9 +20,11 @@ public class ProyectoService {
 
     private final ProyectoRepository proyectoRepository;
     private final UsuarioService usuarioService;
+    private final CreationIdempotency creations;
     private final com.duoc.cursos.repository.EventoRepository eventoRepository;
 
-    public ProyectoService(ProyectoRepository proyectoRepository, UsuarioService usuarioService, com.duoc.cursos.repository.EventoRepository eventoRepository) {
+    public ProyectoService(ProyectoRepository proyectoRepository, UsuarioService usuarioService, com.duoc.cursos.repository.EventoRepository eventoRepository, CreationIdempotency creations) {
+        this.creations = creations;
         this.proyectoRepository = proyectoRepository;
         this.usuarioService = usuarioService;
         this.eventoRepository = eventoRepository;
@@ -43,13 +45,18 @@ public class ProyectoService {
     @Transactional
     public ProyectoResponse crear(ProyectoRequest request) {
         Usuario actual = usuarioService.getCurrentUsuario();
-        Proyecto proyecto = new Proyecto();
-        aplicar(proyecto, request);
-        proyecto.setResponsable(actual);
-        if (proyecto.getEstado() == null) {
-            proyecto.setEstado(EstadoProyecto.PLANIFICADO);
-        }
-        return toResponse(proyectoRepository.save(proyecto));
+        String hash = CreationIdempotency.fingerprint(request.nombre(), request.descripcion(), request.areaTematica(),
+            request.unidadVecinal(), request.fechaInicio(), request.fechaFin(), request.estado());
+        Long id = creations.resolve(actual.getId(), "PROYECTO", request.clientUuid(), hash, () -> {
+            Proyecto proyecto = new Proyecto();
+            aplicar(proyecto, request);
+            proyecto.setResponsable(actual);
+            if (proyecto.getEstado() == null) proyecto.setEstado(EstadoProyecto.PLANIFICADO);
+            return proyectoRepository.save(proyecto).getId();
+        });
+        Proyecto result = require(id);
+        requireOwnerOrAdmin(result);
+        return toResponse(result);
     }
 
     @Transactional

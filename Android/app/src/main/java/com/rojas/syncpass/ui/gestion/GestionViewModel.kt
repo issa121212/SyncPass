@@ -30,7 +30,7 @@ class GestionViewModel @Inject constructor(private val repository: SyncPassOpera
     }
     fun guardarProyecto(id: Long?, request: ProyectoInput, onSuccess: () -> Unit) = ejecutar(
         { if (id == null) repository.crearProyecto(request) else repository.editarProyecto(id, request) },
-        "Proyecto guardado en el servidor", onSuccess)
+        "Proyecto guardado; revisa su estado de sincronización", onSuccess)
     fun eliminarProyecto(id: Long, onSuccess: () -> Unit) = ejecutar(
         { repository.eliminarProyecto(id) }, "Proyecto eliminado del servidor", onSuccess)
     fun guardarRecinto(item: Recinto, onSuccess: () -> Unit) = ejecutar(
@@ -38,7 +38,7 @@ class GestionViewModel @Inject constructor(private val repository: SyncPassOpera
     fun eliminarRecinto(id: Long, onSuccess: () -> Unit) = ejecutar(
         { repository.eliminarRecinto(id) }, "Recinto eliminado de este dispositivo", onSuccess)
     fun consultarProyecto(id: Long, onSuccess: (Proyecto) -> Unit) {
-        ejecutar({ repository.consultarProyecto(id).map { onSuccess(it) } }, "Proyecto consultado en el servidor")
+        ejecutar({ repository.consultarProyecto(id).map { onSuccess(it) } }, "Proyecto consultado")
     }
     fun limpiarMensaje() { _estado.update { it.copy(mensaje = null) } }
     private fun errorVisible(e: Throwable): String =
