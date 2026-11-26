@@ -82,8 +82,7 @@ class CognitoAuthViewModel @Inject constructor(
         }
     }
 
-    fun startLogout() {
-        val idToken = _uiState.value.tokens?.idToken
+    fun startLogout(idToken: String? = _uiState.value.tokens?.idToken) {
         _uiState.update { it.copy(isLoading = true, error = null, tokens = null) }
         viewModelScope.launch {
             runCatching { manager.buildLogoutIntent(idToken) }

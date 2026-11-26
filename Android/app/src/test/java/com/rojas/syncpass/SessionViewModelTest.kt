@@ -10,6 +10,7 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.*
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class SessionViewModelTest {
     @get:Rule val main = MainDispatcherRule()
@@ -69,6 +70,65 @@ class SessionViewModelTest {
             verify(session).clear()
             vm.open(tokens)
             assertNotSame(previous, vm.owner.value)
+        } finally { root.clear() }
+    }
+
+    @Test
+    fun arranqueRestauraSesionVigenteYRecrearNoBorraNiReescribeLosTokens() {
+        val saved = MutableStateFlow<CognitoTokens?>(tokens)
+        `when`(session.hasValidSession()).thenReturn(true)
+        `when`(session.tokens).thenReturn(saved)
+        val vm = SessionViewModel(session, accounts)
+        val root = ViewModelStore().apply { put("session", vm) }
+        val previous = requireNotNull(vm.owner.value)
+        val screen = ScreenViewModel().also { previous.viewModelStore.put("screen", it) }
+        vm.open(tokens)
+        assertSame(previous, vm.owner.value)
+        root.clear()
+        assertTrue(screen.released)
+        val recreated = SessionViewModel(session, accounts)
+        val next = ViewModelStore().apply { put("session", recreated) }
+        try {
+            assertNotNull(recreated.owner.value)
+            assertNotSame(previous, recreated.owner.value)
+            assertFalse(mockingDetails(session).invocations.any { it.method.name == "save" })
+            verify(session, never()).clear()
+            verify(accounts, never()).clear()
+        } finally { next.clear() }
+    }
+
+    @Test
+    fun cerrarSesionRestauradaLiberaPantallasYNoReabreAlCrearOtroViewModel() {
+        val saved = MutableStateFlow<CognitoTokens?>(tokens.copy(idToken = "id-ana"))
+        `when`(session.hasValidSession()).thenAnswer { saved.value != null }
+        `when`(session.tokens).thenReturn(saved)
+        `when`(session.currentIdToken()).thenAnswer { saved.value?.idToken }
+        doAnswer { saved.value = null; null }.`when`(session).clear()
+        val vm = SessionViewModel(session, accounts)
+        val root = ViewModelStore().apply { put("session", vm) }
+        val screen = ScreenViewModel().also { requireNotNull(vm.owner.value).viewModelStore.put("screen", it) }
+        assertEquals("id-ana", vm.idTokenForLogout())
+        vm.close()
+        assertTrue(screen.released)
+        assertNull(vm.owner.value)
+        assertNull(vm.idTokenForLogout())
+        root.clear()
+        val restarted = SessionViewModel(session, accounts)
+        val next = ViewModelStore().apply { put("session", restarted) }
+        try { assertNull(restarted.owner.value) }
+        finally { next.clear() }
+    }
+
+    @Test
+    fun tokenPersistidoVencidoNoAbreElAreaPrivada() {
+        `when`(session.hasValidSession()).thenReturn(false)
+        `when`(session.tokens).thenReturn(MutableStateFlow<CognitoTokens?>(tokens))
+        val vm = SessionViewModel(session, accounts)
+        val root = ViewModelStore().apply { put("session", vm) }
+        try {
+            assertNull(vm.owner.value)
+            verify(accounts, never()).current()
+            assertFalse(mockingDetails(session).invocations.any { it.method.name == "save" })
         } finally { root.clear() }
     }
 }

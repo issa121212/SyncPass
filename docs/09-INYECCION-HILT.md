@@ -20,6 +20,8 @@ Los ViewModels de inicio, gestión, detalle, escáner, sesión y Cognito utiliza
 
 `SessionViewModel` mantiene un `ViewModelStore` para el área privada. Al recrearse la Activity por una configuración, conserva el store. Al cerrar sesión o recibir otra autenticación, libera las pantallas anteriores y sus scopes. El acceso HTTP utiliza un snapshot del token validado para la cuenta solicitante mediante `SessionStore.accessTokenFor`.
 
+La corrección posterior de [restauración de sesión](16-RESTAURACION-SESION.md) recupera tokens persistidos vigentes al reabrir el proceso. Destruir una Activity libera sus pantallas sin descartar el coordinador compartido de la cuenta; logout o cambio de autenticación sí lo descartan.
+
 Cada ViewModel recibe las operaciones de su cuenta al construirse. `SyncWorker` obtiene la sesión y el gestor de cuentas mediante un entry point de Hilt antes de procesar la cola. El interceptor bloquea solicitudes cuando el token disponible corresponde a otra cuenta o ya no es válido.
 
 ## Persistencia y compatibilidad

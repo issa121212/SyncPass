@@ -1,6 +1,6 @@
 # Revisión visual de Android
 
-Se revisó la aplicación actualizada en Pixel 10 emulado con una sesión real de docente iniciada manualmente por el usuario. No se compartieron contraseñas y no se guardaron proyectos, eventos ni asistencias de prueba en producción.
+Se revisó el inicio visible de docente en Pixel 10 emulado. No se compartieron contraseñas y no se guardaron proyectos, eventos ni asistencias de prueba en producción. La comprobación de sesión vigente en el paquete principal se distingue de la inspección visual, pues coexistían una instalación principal y una de validación con el mismo nombre.
 
 ## Comprobaciones
 
@@ -20,4 +20,4 @@ Se conserva el desplazamiento cuando el tamaño de pantalla, el teclado o la acc
 
 ## Comprobaciones pendientes
 
-La revisión de reapertura tras actualizar detectó que el inicio no recuperaba la sesión persistida. Se revisará la restauración en `SessionViewModel` antes de pedir un nuevo login. También quedan los diálogos reales de permisos, cámara física y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
+Se corrigió la [restauración de sesiones vigentes](16-RESTAURACION-SESION.md) y se comprobó mediante pruebas unitarias. La instalación principal conservaba una sesión antigua vencida; para verificar Cognito real debe iniciarse una nueva sesión en ese paquete y reabrirlo. También quedan los diálogos reales de permisos, cámara física y lectura QR en teléfono. La geocerca del servidor ya fue verificada en el entorno local descrito en [Integración Android](14-INTEGRACION-ANDROID.md).
