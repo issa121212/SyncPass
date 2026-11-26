@@ -20,8 +20,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 4 | feature/creacion-offline | PR #10 fusionado en develop |
 | 5 | chore/ensayo-migraciones | PR #11 fusionado en develop |
 | 6 | test/integracion-android | PR #12 fusionado en develop |
-| 7 | fix/validacion-visible-zona | PR #13 abierto hacia develop |
-| 8 | fix/restauracion-sesion | Publicada; esperar integración anterior |
+| 7 | fix/validacion-visible-zona | PR #13 fusionado en develop |
+| 8 | fix/restauracion-sesion | PR #14 abierto hacia develop |
 | 9 | fix/permiso-camara | Publicada; esperar integración anterior |
 | 10 | feature/filtro-estado-eventos | Publicada; esperar integración anterior |
 | 11 | feature/codigos-publicos | Publicada; incluye compatibilidad V6 |
@@ -64,4 +64,8 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Séptimo paso abierto
 
-[PR #13: validación de zona visible](https://github.com/issa121212/SyncPass/pull/13), desde fix/validacion-visible-zona hacia develop. Incluye un commit nuevo con la corrección visual, prueba instrumentada y documentación. Queda pendiente de revisión y fusión manual. Después corresponde fix/restauracion-sesion.
+[PR #13: validación de zona visible](https://github.com/issa121212/SyncPass/pull/13), desde fix/validacion-visible-zona hacia develop. Incluye un commit nuevo con la corrección visual, prueba instrumentada y documentación. El usuario fusionó el PR #13 y se verificó su integración en develop (3ad0196).
+
+## Octavo paso abierto
+
+[PR #14: restauración de sesión](https://github.com/issa121212/SyncPass/pull/14), desde fix/restauracion-sesion hacia develop. Incluye tres commits nuevos y conserva la expiración original de Cognito. Queda pendiente de revisión y fusión manual. Después corresponde fix/permiso-camara.
