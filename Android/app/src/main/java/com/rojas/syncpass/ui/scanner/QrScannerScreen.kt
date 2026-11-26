@@ -1,5 +1,14 @@
 package com.rojas.syncpass.ui.scanner
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,9 +65,28 @@ fun QrScannerScreen(
                 PackageManager.PERMISSION_GRANTED
         )
     }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val activity = remember(context) { context.cameraActivity() }
+    var abrirAjustes by remember { mutableStateOf(false) }
+    fun actualizarPermiso() {
+        tienePermiso = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED
+        if (tienePermiso) abrirAjustes = false
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) actualizarPermiso()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { concedido -> tienePermiso = concedido }
+    ) { concedido ->
+        tienePermiso = concedido
+        abrirAjustes = !concedido && activity != null &&
+            !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
+    }
 
     LaunchedEffect(Unit) {
         if (!tienePermiso) launcher.launch(Manifest.permission.CAMERA)
@@ -84,14 +112,20 @@ fun QrScannerScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        "Se necesita acceso a la cámara para leer el código QR.",
+                        if (abrirAjustes) "El permiso de cámara está bloqueado. Actívalo en los ajustes de la aplicación para leer el código QR."
+                        else "Se necesita acceso a la cámara para leer el código QR.",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Button(
-                        onClick = { launcher.launch(Manifest.permission.CAMERA) },
+                        onClick = {
+                            if (abrirAjustes) {
+                                context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.parse("package:${context.packageName}")))
+                            } else launcher.launch(Manifest.permission.CAMERA)
+                        },
                         modifier = Modifier.padding(top = 16.dp),
                     ) {
-                        Text("Permitir cámara")
+                        Text(if (abrirAjustes) "Abrir ajustes" else "Permitir cámara")
                     }
                 }
             } else {
@@ -176,4 +210,10 @@ private fun CameraPreview(onScanned: (String) -> Unit) {
         factory = { previewView },
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+private fun Context.cameraActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.cameraActivity()
+    else -> null
 }
