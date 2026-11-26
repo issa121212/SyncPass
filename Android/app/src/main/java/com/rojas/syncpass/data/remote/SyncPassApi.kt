@@ -10,6 +10,9 @@ import retrofit2.http.Query
 
 interface SyncPassApi {
 
+    @GET("api/sync/capabilities")
+    suspend fun creationCapabilities(): CreationCapabilities
+
     @GET("api/auth/me")
     suspend fun me(): UsuarioResponse
 

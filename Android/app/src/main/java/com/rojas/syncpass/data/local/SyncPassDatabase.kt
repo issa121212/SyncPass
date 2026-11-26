@@ -12,8 +12,9 @@ import androidx.room.RoomDatabase
         PerfilEntity::class,
         PendienteEntity::class,
         RecintoEntity::class,
+        CreationEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class SyncPassDatabase : RoomDatabase() {
@@ -22,6 +23,19 @@ abstract class SyncPassDatabase : RoomDatabase() {
     abstract fun recintoDao(): RecintoDao
 
     companion object {
+        val MIGRATION_4_5 = object : androidx.room.migration.Migration(4, 5) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                for (table in listOf("proyectos", "eventos")) {
+                    db.execSQL("ALTER TABLE $table ADD COLUMN syncState TEXT NOT NULL DEFAULT 'CONFIRMADO'")
+                    db.execSQL("ALTER TABLE $table ADD COLUMN syncError TEXT")
+                }
+                db.execSQL("""CREATE TABLE IF NOT EXISTS creaciones (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, clientUuid TEXT NOT NULL,
+                    tipo TEXT NOT NULL, payload TEXT NOT NULL, proyectoId INTEGER, remoteId INTEGER,
+                    estado TEXT NOT NULL, error TEXT)""")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_creaciones_clientUuid ON creaciones(clientUuid)")
+            }
+        }
         val MIGRATION_3_4 = object : androidx.room.migration.Migration(3, 4) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE pendientes ADD COLUMN ubicacionEn TEXT")
@@ -52,7 +66,7 @@ abstract class SyncPassDatabase : RoomDatabase() {
             return instances.getOrPut(suffix) {
                 Room.databaseBuilder(context.applicationContext,
                     SyncPassDatabase::class.java, "syncpass-$suffix.db")
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build()
             }
         }
     }

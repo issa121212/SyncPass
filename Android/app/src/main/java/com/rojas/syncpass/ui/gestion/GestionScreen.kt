@@ -41,7 +41,7 @@ fun GestionScreen(vm: GestionViewModel, onBack: () -> Unit) {
             Text("Esta seccion requiere una cuenta docente.", Modifier.padding(padding).padding(16.dp))
         } else Column(Modifier.padding(padding).fillMaxSize()) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                FilterChip(selected = tab == 0, onClick = { tab = 0 }, label = { Text("Proyectos · API") })
+                FilterChip(selected = tab == 0, onClick = { tab = 0 }, label = { Text("Proyectos") })
                 FilterChip(selected = tab == 1, onClick = { tab = 1 }, label = { Text("Recintos · Local") })
             }
             Button(onClick = {
@@ -52,7 +52,7 @@ fun GestionScreen(vm: GestionViewModel, onBack: () -> Unit) {
             }
             if (estado.guardando) LinearProgressIndicator(Modifier.fillMaxWidth())
             LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                item { Text(if (tab == 0) "Los cambios se confirman en el servidor. Requieren conexion."
+                item { Text(if (tab == 0) "Puedes crear sin conexión. Editar o eliminar registros confirmados requiere conexión."
                     else "Catalogo de recintos de esta cuenta y dispositivo. Funciona sin conexion.") }
                 if (tab == 0) {
                     if (proyectos.isEmpty()) item { Text("No hay proyectos") }
@@ -61,9 +61,10 @@ fun GestionScreen(vm: GestionViewModel, onBack: () -> Unit) {
                         Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) {
                             Text(p.nombre, style = MaterialTheme.typography.titleMedium)
                             Text(p.descripcion.orEmpty())
+                            if (p.syncState != "CONFIRMADO") Text("${p.syncState}: ${p.syncError ?: "Se enviará al sincronizar"}")
                             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                 TextButton(onClick = { vm.consultarProyecto(p.id) { proyectoDetalle = it } }, enabled = !estado.guardando) { Text("Ver detalle") }
-                                if (puede) {
+                                if (puede && p.id > 0) {
                                     TextButton(onClick = { proyectoEditar = p; proyectoForm = true }, enabled = !estado.guardando) { Text("Editar") }
                                     TextButton(onClick = { proyectoEliminar = p }, enabled = !estado.guardando) { Text("Eliminar") }
                                 }

@@ -21,6 +21,7 @@ class HomeViewModel @Inject constructor(
 
     private data class Estado(
         val cargando: Boolean = false,
+        val creando: Boolean = false,
         val mensaje: String? = null,
         val error: String? = null,
     )
@@ -42,7 +43,7 @@ class HomeViewModel @Inject constructor(
     }
 
     val uiState = combine(datos, estado, repository.recintos, repository.rechazadas) { base, est, recintos, rechazadas ->
-        base.copy(cargando = est.cargando, mensaje = est.mensaje, error = est.error, recintos = recintos, rechazadas = rechazadas)
+        base.copy(cargando = est.cargando, creando = est.creando, mensaje = est.mensaje, error = est.error, recintos = recintos, rechazadas = rechazadas)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
     init {
@@ -70,7 +71,7 @@ class HomeViewModel @Inject constructor(
                     estado.update {
                         it.copy(
                             cargando = false,
-                            mensaje = if (n == 0) "Todo está sincronizado" else "$n operaciones sincronizadas",
+                            mensaje = if (n == 0) "Sincronización terminada; revisa pendientes y rechazos" else "$n operaciones sincronizadas",
                         )
                     }
                 }
@@ -90,21 +91,25 @@ class HomeViewModel @Inject constructor(
         fechaInicio: String,
         fechaFin: String,
     ) {
+        if (estado.value.creando) return
+        estado.update { it.copy(creando = true, error = null) }
         viewModelScope.launch {
-            repository.crearProyecto(
-                ProyectoInput(
-                    nombre = nombre,
-                    descripcion = descripcion.ifBlank { null },
-                    areaTematica = areaTematica.ifBlank { null },
-                    unidadVecinal = unidadVecinal.ifBlank { null },
-                    fechaInicio = fechaInicio.ifBlank { null },
-                    fechaFin = fechaFin.ifBlank { null },
-                )
-            ).onSuccess {
-                estado.update { it.copy(mensaje = "Proyecto creado") }
-            }.onFailure { e ->
-                estado.update { it.copy(error = "No se pudo crear el proyecto: ${e.message}") }
-            }
+            try {
+                repository.crearProyecto(
+                    ProyectoInput(
+                        nombre = nombre,
+                        descripcion = descripcion.ifBlank { null },
+                        areaTematica = areaTematica.ifBlank { null },
+                        unidadVecinal = unidadVecinal.ifBlank { null },
+                        fechaInicio = fechaInicio.ifBlank { null },
+                        fechaFin = fechaFin.ifBlank { null },
+                    )
+                ).onSuccess {
+                    estado.update { it.copy(mensaje = "Proyecto guardado; revisa su estado de sincronización") }
+                }.onFailure { e ->
+                    estado.update { it.copy(error = "No se pudo crear el proyecto: ${e.message}") }
+                }
+            } finally { estado.update { it.copy(creando = false) } }
         }
     }
 
@@ -120,25 +125,29 @@ class HomeViewModel @Inject constructor(
         longitud: Double?,
         radioMetros: Int,
     ) {
+        if (estado.value.creando) return
+        estado.update { it.copy(creando = true, error = null) }
         viewModelScope.launch {
-            repository.crearEvento(
-                EventoInput(
-                    proyectoId = proyectoId,
-                    nombre = nombre,
-                    descripcion = descripcion.ifBlank { null },
-                    fechaHora = fechaHora,
-                    cupos = cupos,
-                    recinto = recinto.ifBlank { null },
-                    direccion = direccion.ifBlank { null },
-                    latitud = latitud,
-                    longitud = longitud,
-                    radioMetros = radioMetros,
-                )
-            ).onSuccess {
-                estado.update { it.copy(mensaje = "Evento creado") }
-            }.onFailure { e ->
-                estado.update { it.copy(error = "No se pudo crear el evento: ${e.message}") }
-            }
+            try {
+                repository.crearEvento(
+                    EventoInput(
+                        proyectoId = proyectoId,
+                        nombre = nombre,
+                        descripcion = descripcion.ifBlank { null },
+                        fechaHora = fechaHora,
+                        cupos = cupos,
+                        recinto = recinto.ifBlank { null },
+                        direccion = direccion.ifBlank { null },
+                        latitud = latitud,
+                        longitud = longitud,
+                        radioMetros = radioMetros,
+                    )
+                ).onSuccess {
+                    estado.update { it.copy(mensaje = "Evento guardado; revisa su estado de sincronización") }
+                }.onFailure { e ->
+                    estado.update { it.copy(error = "No se pudo crear el evento: ${e.message}") }
+                }
+            } finally { estado.update { it.copy(creando = false) } }
         }
     }
 

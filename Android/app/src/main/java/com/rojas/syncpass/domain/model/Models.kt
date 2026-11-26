@@ -12,6 +12,8 @@ data class Proyecto(
     val responsableNombre: String?,
     val responsableEmail: String?,
     val responsableId: Long? = null,
+    val syncState: String = "CONFIRMADO",
+    val syncError: String? = null,
 )
 
 data class Evento(
@@ -35,6 +37,8 @@ data class Evento(
     val esPresente: Boolean,
     val encuestaRespondida: Boolean,
     val actualizadoEn: String?,
+    val syncState: String = "CONFIRMADO",
+    val syncError: String? = null,
 )
 
 data class Perfil(

@@ -137,6 +137,7 @@ data class ProyectoRequest(
     val fechaInicio: String? = null,
     val fechaFin: String? = null,
     val estado: String? = "PLANIFICADO",
+    val clientUuid: String? = null,
 )
 
 data class EventoRequest(
@@ -151,7 +152,10 @@ data class EventoRequest(
     val longitud: Double? = null,
     val radioMetros: Int = 200,
     val estado: String? = "PROGRAMADO",
+    val clientUuid: String? = null,
 )
+
+data class CreationCapabilities(val creacionIdempotente: Boolean = false)
 
 data class AsistenciaSyncItem(
     val clientUuid: String,

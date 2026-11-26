@@ -36,10 +36,21 @@ class SyncPassRepository(
     private val dao: SyncPassDao,
     private val sessionStore: SessionStore,
     recintoDao: com.rojas.syncpass.data.local.RecintoDao,
+    private val creationStore: com.rojas.syncpass.data.local.CreationStore = com.rojas.syncpass.data.local.RoomCreationStore(dao),
 ) : SyncPassOperations,
     ProyectosRepository by ApiProyectosRepository(api, dao),
     RecintosRepository by RoomRecintosRepository(recintoDao) {
     private val syncMutex = Mutex()
+    private val creations = OfflineCreations(api, creationStore)
+    override suspend fun crearProyecto(request: ProyectoInput): Result<Unit> = resultado {
+        val id = syncMutex.withLock { creations.project(request) }
+        sincronizar()
+        creations.projectResult(id)
+    }
+    override suspend fun consultarProyecto(id: Long): Result<Proyecto> = if (id < 0) resultado {
+        requireNotNull(creationStore.project(id)).toDomain()
+    } else ApiProyectosRepository(api, dao).consultarProyecto(id)
+
     override val eventos = dao.observarEventos().map { list -> list.map { it.toDomain() } }
     override val perfil: Flow<Perfil?> = dao.observarPerfil().map { cached ->
         cached?.copy(nombre = sessionStore.cognitoName().orEmpty())?.toDomain()
@@ -71,11 +82,13 @@ class SyncPassRepository(
         dao.reemplazarEventos(eventos.map { it.toEntity() })
     } }
     override suspend fun refrescarEvento(id: Long): Result<Evento> = syncMutex.withLock { resultado {
+        require(id > 0) { "El evento está guardado localmente; sincroniza para confirmarlo" }
         val evento = api.evento(id).toEntity()
         dao.guardarEventoConPendientes(evento)
         evento.toDomain()
     } }
     override suspend fun inscribirse(evento: Evento): Result<Unit> = resultado {
+        require(evento.id > 0) { "Espera la confirmación del evento antes de inscribirte" }
         val codigo = evento.qrContenido ?: "EVENTO_${evento.id}"
         try {
             api.inscribirse(InscribirseRequest(codigo))
@@ -102,7 +115,10 @@ class SyncPassRepository(
         eventoId: Long,
         codigoQr: String,
         captura: AttendanceCapture,
-    ): Result<AttendanceOutcome> = asistencias.capture(eventoId, codigoQr, captura)
+    ): Result<AttendanceOutcome> = resultado {
+        require(eventoId > 0) { "Espera la confirmación del evento antes de escanear" }
+        asistencias.capture(eventoId, codigoQr, captura).getOrThrow()
+    }
     override suspend fun guardarEncuesta(
         eventoId: Long,
         satisfaccion: Int,
@@ -125,19 +141,20 @@ class SyncPassRepository(
         dao.marcarEncuesta(eventoId)
         sincronizar()
     }
-    override suspend fun crearEvento(request: EventoInput): Result<Evento> = syncMutex.withLock { resultado {
-        request.validar()
-        val evento = api.crearEvento(request.toRequest())
-        dao.guardarEvento(evento.toEntity())
-        evento.toEntity().toDomain()
-    } }
+    override suspend fun crearEvento(request: EventoInput): Result<Evento> = resultado {
+        val id = syncMutex.withLock { creations.event(request) }
+        sincronizar()
+        creations.eventResult(id)
+    }
     override suspend fun editarEvento(id: Long, request: EventoInput): Result<Evento> = syncMutex.withLock { resultado {
+        require(id > 0 && request.proyectoId > 0) { "Espera la confirmación del proyecto y del evento antes de editar" }
         request.validar()
         val evento = api.editarEvento(id, request.toRequest()).toEntity()
         dao.guardarEventoConPendientes(evento)
         evento.toDomain()
     } }
     override suspend fun eliminarEvento(id: Long): Result<Unit> = syncMutex.withLock { resultado {
+        require(id > 0) { "Esta creación local aún no está confirmada en el servidor" }
         require(dao.pendientesDelEvento(id) == 0) { "Sincroniza las operaciones pendientes antes de eliminar el evento" }
         api.eliminarEvento(id)
         dao.eliminarEvento(id)
@@ -153,6 +170,7 @@ class SyncPassRepository(
      */
     override suspend fun sincronizar(): Result<Int> = syncMutex.withLock {
         resultado {
+            val creationResult = creations.synchronize()
             val pendientes = dao.pendientes().sortedBy {
                 when (it.tipo) {
                     PendienteEntity.TIPO_INSCRIPCION -> 0
@@ -160,8 +178,8 @@ class SyncPassRepository(
                     else -> 1
                 }
             }
-            var procesados = 0
-            var transitorio: AppException? = null
+            var procesados = creationResult.first
+            var transitorio: AppException? = creationResult.second
             val eventosBloqueados = mutableSetOf<Long>()
             for (p in pendientes) {
                 if (p.eventoId in eventosBloqueados) continue

@@ -12,9 +12,12 @@ data class HomeUiState(
     val recintos: List<com.rojas.syncpass.domain.model.Recinto> = emptyList(),
     val rechazadas: List<com.rojas.syncpass.domain.OperacionRechazada> = emptyList(),
     val cargando: Boolean = false,
+    val creando: Boolean = false,
     val mensaje: String? = null,
     val error: String? = null,
 ) {
+    val totalRechazadas: Int
+        get() = rechazadas.size + proyectos.count { it.syncState == "RECHAZADO" } + eventos.count { it.syncState == "RECHAZADO" }
     private val rolesSet: Set<String>
         get() = perfil?.roles
             ?.split(",")

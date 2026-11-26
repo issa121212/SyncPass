@@ -16,6 +16,8 @@ data class ProyectoEntity(
     val responsableNombre: String?,
     val responsableEmail: String?,
     val responsableId: Long? = null,
+    @androidx.room.ColumnInfo(defaultValue = "'CONFIRMADO'") val syncState: String = "CONFIRMADO",
+    val syncError: String? = null,
 )
 
 @Entity(tableName = "eventos")
@@ -40,6 +42,8 @@ data class EventoEntity(
     val esPresente: Boolean,
     val encuestaRespondida: Boolean,
     val actualizadoEn: String?,
+    @androidx.room.ColumnInfo(defaultValue = "'CONFIRMADO'") val syncState: String = "CONFIRMADO",
+    val syncError: String? = null,
 )
 
 @Entity(tableName = "perfil")
@@ -93,4 +97,16 @@ data class RecintoEntity(
     val latitud: Double? = null,
     val longitud: Double? = null,
     val radioMetros: Int = 200,
+)
+
+@Entity(tableName = "creaciones", indices = [androidx.room.Index(value = ["clientUuid"], unique = true)])
+data class CreationEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val clientUuid: String,
+    val tipo: String,
+    val payload: String,
+    val proyectoId: Long? = null,
+    val remoteId: Long? = null,
+    val estado: String = "PENDIENTE",
+    val error: String? = null,
 )
