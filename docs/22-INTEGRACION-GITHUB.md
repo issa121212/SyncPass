@@ -17,8 +17,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 1 | feature/inyeccion-hilt | PR #7 fusionado en develop |
 | 2 | feature/ubicacion-eventos | PR #8 fusionado en develop |
 | 3 | feature/geolocalizacion-asistencia | PR #9 fusionado en develop |
-| 4 | feature/creacion-offline | PR #10 abierto hacia develop |
-| 5 | chore/ensayo-migraciones | Publicada; esperar integración anterior |
+| 4 | feature/creacion-offline | PR #10 fusionado en develop |
+| 5 | chore/ensayo-migraciones | PR #11 abierto hacia develop |
 | 6 | test/integracion-android | Publicada; esperar integración anterior |
 | 7 | fix/validacion-visible-zona | Publicada; esperar integración anterior |
 | 8 | fix/restauracion-sesion | Publicada; esperar integración anterior |
@@ -52,4 +52,8 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Cuarto paso abierto
 
-[PR #10: creación offline](https://github.com/issa121212/SyncPass/pull/10), desde feature/creacion-offline hacia develop. Incluye cinco commits nuevos, con cola local y creaciones idempotentes en el backend. Queda pendiente de revisión y fusión manual. Después corresponde chore/ensayo-migraciones.
+[PR #10: creación offline](https://github.com/issa121212/SyncPass/pull/10), desde feature/creacion-offline hacia develop. Incluye cinco commits nuevos, con cola local y creaciones idempotentes en el backend. El usuario fusionó el PR #10 y se verificó su integración en develop (bc95a5e).
+
+## Quinto paso abierto
+
+[PR #11: respaldo y ensayo de migraciones](https://github.com/issa121212/SyncPass/pull/11), desde chore/ensayo-migraciones hacia develop. Incluye tres commits nuevos y no ejecuta operaciones en EC2 al integrarse. Queda pendiente de revisión y fusión manual. Después corresponde test/integracion-android.
