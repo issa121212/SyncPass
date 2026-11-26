@@ -93,6 +93,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.maplibre.android)
     implementation(libs.hilt.android)
     implementation(libs.hilt.viewmodel.compose)
     ksp(libs.hilt.compiler)
