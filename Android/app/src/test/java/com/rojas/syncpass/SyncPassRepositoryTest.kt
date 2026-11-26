@@ -21,6 +21,7 @@ class SyncPassRepositoryTest {
     private val repository: SyncPassRepository
         get() {
             `when`(dao.observarPerfil()).thenReturn(flowOf(null))
+            kotlinx.coroutines.runBlocking { `when`(dao.creacionesPendientes()).thenReturn(emptyList()) }
             return SyncPassRepository(api, dao, mock(SessionStore::class.java), mock(RecintoDao::class.java))
         }
 
