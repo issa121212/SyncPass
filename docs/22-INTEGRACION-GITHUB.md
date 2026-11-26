@@ -23,8 +23,8 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 7 | fix/validacion-visible-zona | PR #13 fusionado en develop |
 | 8 | fix/restauracion-sesion | PR #14 fusionado en develop |
 | 9 | fix/permiso-camara | PR #15 fusionado en develop |
-| 10 | feature/filtro-estado-eventos | PR #16 abierto hacia develop |
-| 11 | feature/codigos-publicos | Publicada; incluye compatibilidad V6 |
+| 10 | feature/filtro-estado-eventos | PR #16 fusionado en develop |
+| 11 | feature/codigos-publicos | PR #17 abierto; incluye compatibilidad V6 |
 | 12 | test/cobertura-minima-android | Publicada; incluye verificación mínima y esta guía |
 
 Cada rama contiene a la anterior como ancestro. Se verificó esa relación antes de publicar. Las ramas locales descartadas de Supabase y de asistencia antigua no forman parte de esta subida.
@@ -76,4 +76,8 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 ## Décimo paso abierto
 
-[PR #16: filtro de eventos por estado](https://github.com/issa121212/SyncPass/pull/16), desde feature/filtro-estado-eventos hacia develop. Incluye un commit nuevo y mantiene el catálogo local sin paginación. Queda pendiente de revisión y fusión manual. Después corresponde feature/codigos-publicos.
+[PR #16: filtro de eventos por estado](https://github.com/issa121212/SyncPass/pull/16), desde feature/filtro-estado-eventos hacia develop. Incluye un commit nuevo y mantiene el catálogo local sin paginación. El usuario fusionó el PR #16 y se verificó su integración en develop (460f480).
+
+## Undécimo paso abierto
+
+[PR #17: códigos públicos](https://github.com/issa121212/SyncPass/pull/17), desde feature/codigos-publicos hacia develop. Incluye cinco commits nuevos con Android, Flyway V5/V6 y compatibilidad de recuperación. Queda pendiente de revisión y fusión manual. Después corresponde test/cobertura-minima-android. Fusionar no despliega el backend en EC2.
