@@ -80,3 +80,14 @@ Falta ejecutar con el servicio disponible:
 - Recorrido visual manual con teclado, texto grande, rotación y pérdida real de conectividad. Los asserts automáticos no sustituyen esta revisión.
 
 La cámara y Ubicación actual habían sido confirmadas por el usuario en el teléfono; eso no demuestra por sí solo los rechazos geográficos del backend. Este trabajo no cambia el backend ni registra asistencias de negocio.
+
+## Comprobación tras encender el backend
+
+El usuario confirmó que el backend estaba apagado durante la primera revisión. Al repetir la comprobación el 27-11-2026 (05:31 UTC), API Gateway respondió:
+
+- GET /api/health: 200, status UP.
+- GET /api/eventos sin token: 401.
+- GET /api/sync/capabilities sin token: 401.
+- OPTIONS /api/eventos desde https://syncpassweb.vercel.app: 200 con ese origen permitido.
+
+Esto confirma disponibilidad, rechazo de esas consultas sin autenticación y respuesta del preflight para ese origen. No acredita aún autorización con sesiones reales, sincronización entre clientes ni asistencia dentro/fuera del radio. Las comprobaciones funcionales anteriores siguen pendientes; el bloqueo de disponibilidad quedó resuelto.
