@@ -47,6 +47,12 @@ El backend también se identifica en el trabajo como **fs2-api**, carpeta indepe
 
 Con el backend remoto no es necesario ejecutar Java o PostgreSQL en el PC. EC2 y el Learner Lab deben estar activos. Para el backend local, Postgres/H2 y la conexión de dispositivos, consultar [ejecución](docs/06-EJECUCION-Y-DESPLIEGUE.md).
 
+## Pruebas de Android
+
+Desde `Android/`, ejecutar `.\gradlew.bat :app:check`. Incluye la suite local JUnit, lint y un mínimo automático de **70 % de líneas** en `:app`. El informe completo conserva UI y código generado; las pruebas instrumentadas se verifican por separado y no suman a ese porcentaje.
+
+La [revisión de pruebas y cobertura](docs/25-REVISION-Y-COBERTURA-ANDROID.md) distingue pruebas unitarias, componentes simulados y comprobaciones en el teléfono, y detalla lo pendiente contra EC2.
+
 ## Documentación
 
 El [índice](docs/README.md) reúne arquitectura, requisitos, permisos, API, sincronización, despliegue, manual, dependencias, pruebas y Gitflow.

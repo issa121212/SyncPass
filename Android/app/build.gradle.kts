@@ -51,6 +51,8 @@ tasks.withType<Test>().configureEach {
 }
 
 android {
+    sourceSets.getByName("test").kotlin.directories.add("src/sharedTest/java")
+    sourceSets.getByName("androidTest").kotlin.directories.add("src/sharedTest/java")
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -120,6 +122,8 @@ android {
 }
 
 dependencies {
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.robolectric)
     implementation(libs.maplibre.android)
     implementation(libs.hilt.android)
@@ -174,11 +178,11 @@ dependencies {
 
 val verifyDebugUnitTestCoverage = tasks.register("verifyDebugUnitTestCoverage") {
     group = "verification"
-    description = "Exige al menos 30 % de líneas en la suite local JUnit, sin cobertura instrumentada."
+    description = "Exige al menos 70 % de líneas en la suite local JUnit, sin cobertura instrumentada."
     dependsOn("createDebugUnitTestCoverageReport")
     val report = layout.buildDirectory.file("reports/coverage/test/debug/report.xml")
     inputs.file(report)
-    inputs.property("minimumLineCoveragePercent", 30)
+    inputs.property("minimumLineCoveragePercent", 70)
     doLast {
         val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance().apply {
             setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
@@ -191,10 +195,10 @@ val verifyDebugUnitTestCoverage = tasks.register("verifyDebugUnitTestCoverage") 
         }.single { it.tagName == "counter" && it.getAttribute("type") == "LINE" }
         val covered = counter.getAttribute("covered").toLong()
         val total = covered + counter.getAttribute("missed").toLong()
-        check(total > 0 && covered * 100 >= total * 30) {
-            "Cobertura local insuficiente: $covered/$total líneas. Mínimo requerido: 30 %."
+        check(total > 0 && covered * 100 >= total * 70) {
+            "Cobertura local insuficiente: $covered/$total líneas. Mínimo requerido: 70 %."
         }
-        logger.lifecycle("Cobertura local JUnit: {} % ({}/{} líneas); mínimo: 30 %.",
+        logger.lifecycle("Cobertura local JUnit: {} % ({}/{} líneas); mínimo: 70 %.",
             String.format(Locale.ROOT, "%.2f", covered * 100.0 / total), covered, total)
     }
 }
