@@ -31,6 +31,8 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 
 25. [Ubicación actual mediante GPS y red](24-UBICACION-GPS-RED.md).
 
+26. [Revisión y ampliación de pruebas Android](25-REVISION-Y-COBERTURA-ANDROID.md).
+
 ## Cómo interpretar el alcance
 
 Los documentos describen las funcionalidades de la entrega: autenticación Cognito, dashboards por rol, CRUD de proyectos y eventos mediante API, recintos locales, inscripciones, asistencia mediante QR, encuestas y sincronización de operaciones. La documentación presenta el sistema desde la perspectiva de quien lo utiliza, ejecuta o mantiene, sin depender del estado temporal de las ramas de desarrollo.

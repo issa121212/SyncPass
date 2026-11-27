@@ -1,6 +1,8 @@
 # Cobertura mínima Android · 26-11-2026
 
-## Resultado actual
+Esta revisión conserva el resultado histórico del 26-11-2026. La ampliación y el mínimo vigente de 70 % se describen en [Revisión y cobertura Android](25-REVISION-Y-COBERTURA-ANDROID.md).
+
+## Resultado histórico
 
 La suite local JUnit del módulo Android `:app` supera el mínimo de 30 % de líneas. Se ejecutó sin emulador, teléfono, API remota ni base de datos de EC2.
 
