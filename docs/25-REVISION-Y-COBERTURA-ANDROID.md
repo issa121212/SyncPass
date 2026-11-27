@@ -99,3 +99,9 @@ A petición del usuario se creó el evento temporal **Prueba radio 27-11**, cód
 Se preparó como fixture mediante una transacción PostgreSQL en EC2, no mediante el formulario ni el endpoint de creación. La transacción comprobó el responsable docente, conservó las huellas de todos los eventos previos, utilizó la generación/reserva de código público de V6 y configuró el QR habitual. Esta preparación no acredita el CRUD ni sus controles de autorización.
 
 Desde la sesión participante de la web se actualizó el catálogo y se confirmó la inscripción mediante la interfaz y API reales. La web mostró 1 inscrito y 0 presentes; en Mis inscripciones quedó visible el QR personal para escanear desde el evento correcto en Android. El rechazo fuera del radio y la aceptación tras ajustar la zona siguen pendientes del escaneo físico.
+
+## Prueba física fuera de zona
+
+El usuario escaneó desde Android y reportó el mensaje de acercarse a la zona. Ese texto corresponde a AttendanceLocationPolicy de Android (Acércate al centro de la zona y vuelve a intentar el escaneo), que valida antes de guardar o enviar la captura. Una consulta posterior en EC2 confirmó que el evento de prueba conserva 1 inscrito y 0 presentes.
+
+Se confirma el bloqueo preventivo en el cliente y que la asistencia no quedó presente. Este resultado no acredita por sí solo una respuesta 422 de ENFORCE del backend: el cliente puede detener la captura antes de enviarla. La prueba de aceptación dentro de zona sigue pendiente. La fecha existente de una fila de asistencia no se interpreta como presencia; la inscripción crea una fila con es_presente=false.
