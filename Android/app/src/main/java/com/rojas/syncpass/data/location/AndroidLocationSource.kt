@@ -15,7 +15,6 @@ import com.rojas.syncpass.domain.model.DeviceLocation
 import com.rojas.syncpass.domain.model.GeoPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Clock
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -35,16 +34,16 @@ class AndroidLocationSource @Inject constructor(
             .filter { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
         require(providers.isNotEmpty()) { "Activa la ubicación del dispositivo" }
         val cached = providers.mapNotNull { runCatching { manager.getLastKnownLocation(it) }.getOrNull() }
-            .maxByOrNull { it.time }
-            ?.toDomain()
-            ?.takeIf { runCatching { it.validate(clock.millis()) }.isSuccess }
-        val location = cached ?: withTimeoutOrNull(12_000) {
+            .map { it.toDomain() }
+            .filter { runCatching { it.validate(clock.millis()) }.isSuccess }
+            .maxByOrNull { it.recordedAtMillis }
+        val location = cached ?: firstValidLocation(providers, clock) { provider ->
             suspendCancellableCoroutine { continuation ->
                 val cancellation = CancellationSignal()
                 continuation.invokeOnCancellation { cancellation.cancel() }
                 try {
                     LocationManagerCompat.getCurrentLocation(
-                        manager, providers.first(), cancellation, ContextCompat.getMainExecutor(context),
+                        manager, provider, cancellation, ContextCompat.getMainExecutor(context),
                     ) { result -> if (continuation.isActive) continuation.resume(result?.toDomain()) }
                 } catch (error: Exception) {
                     if (continuation.isActive) continuation.resume(null)

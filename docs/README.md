@@ -29,6 +29,8 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 23. [Integración paso a paso en GitHub](22-INTEGRACION-GITHUB.md).
 24. [Despliegue de códigos públicos V5/V6 en EC2](23-DESPLIEGUE-CODIGOS-PUBLICOS.md).
 
+25. [Ubicación actual mediante GPS y red](24-UBICACION-GPS-RED.md).
+
 ## Cómo interpretar el alcance
 
 Los documentos describen las funcionalidades de la entrega: autenticación Cognito, dashboards por rol, CRUD de proyectos y eventos mediante API, recintos locales, inscripciones, asistencia mediante QR, encuestas y sincronización de operaciones. La documentación presenta el sistema desde la perspectiva de quien lo utiliza, ejecuta o mantiene, sin depender del estado temporal de las ramas de desarrollo.
