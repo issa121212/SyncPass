@@ -27,6 +27,7 @@ Documentación técnica y funcional de SyncPass Android y su backend compartido.
 21. [Revisión previa a integración](20-REVISION-PREINTEGRACION.md).
 22. [Cobertura mínima Android y verificación automática](21-COBERTURA-MINIMA-ANDROID.md).
 23. [Integración paso a paso en GitHub](22-INTEGRACION-GITHUB.md).
+24. [Despliegue de códigos públicos V5/V6 en EC2](23-DESPLIEGUE-CODIGOS-PUBLICOS.md).
 
 ## Cómo interpretar el alcance
 

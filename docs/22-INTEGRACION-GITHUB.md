@@ -25,7 +25,7 @@ El usuario fusionó el PR #7 en develop mediante merge commit (10c047c). La inte
 | 9 | fix/permiso-camara | PR #15 fusionado en develop |
 | 10 | feature/filtro-estado-eventos | PR #16 fusionado en develop |
 | 11 | feature/codigos-publicos | PR #17 fusionado; incluye compatibilidad V6 |
-| 12 | test/cobertura-minima-android | PR #18 abierto; último de la cadena |
+| 12 | test/cobertura-minima-android | PR #18 fusionado; cadena integrada |
 
 Cada rama contiene a la anterior como ancestro. Se verificó esa relación antes de publicar. Las ramas locales descartadas de Supabase y de asistencia antigua no forman parte de esta subida.
 
@@ -86,4 +86,4 @@ La publicación de ramas no modifica EC2 ni actualiza el teléfono. No se enviar
 
 [PR #18: cobertura mínima y documentación](https://github.com/issa121212/SyncPass/pull/18), desde test/cobertura-minima-android hacia develop. Incluye cinco pruebas nuevas de componentes locales, configuración y verificación mínima de 30 % de líneas. La suite local registra 100 pruebas aprobadas y 45,22 % de líneas sin sumar instrumentadas ni excluir archivos del módulo. Incluye también el registro documental de esta secuencia de integración.
 
-Queda pendiente de revisión y fusión manual. Tras fusionarlo corresponde actualizar develop local y validar su compilación, pruebas y cobertura antes del despliegue específico de V5/V6, las pruebas del teléfono y la release.
+El usuario fusionó el PR #18. Se verificó develop en 0667534, se actualizó la rama local mediante fast-forward y su contenido coincidió con la entrega validada. Check, compilación Android y bootJar aprobaron; la suite local registra 100 pruebas aprobadas y 45,22 % de líneas. El despliegue posterior de V5/V6 se registra en el documento 23. Quedan el recorrido final del teléfono y la release.

@@ -99,7 +99,7 @@ Hilt proporciona dependencias mediante módulos y constructores. `AccountCompone
 
 La cola de creaciones se procesa antes que la de inscripciones, asistencias y encuestas. `OfflineCreations` depende de la frontera `CreationStore`; `RoomCreationStore` aplica las transacciones del DAO. `RoomAsistenciasRepository` persiste la evidencia de captura y delega el envío al coordinador. El mismo Mutex coordina sincronización manual y trabajo de fondo.
 
-Estos diagramas describen la entrega local. El despliegue de V3/V4 y la activación posterior de ENFORCE se registran en [el documento de EC2](17-DESPLIEGUE-BACKEND.md). V5/V6 de códigos públicos y compatibilidad siguen siendo migraciones locales pendientes de despliegue.
+Estos diagramas describen la entrega local. El despliegue de V3/V4 y la activación posterior de ENFORCE se registran en [el documento de EC2](17-DESPLIEGUE-BACKEND.md). V5/V6 de códigos públicos y compatibilidad se desplegaron posteriormente desde develop, según [el documento 23](23-DESPLIEGUE-CODIGOS-PUBLICOS.md).
 
 
 `AccountComponent` y `AccountDependencies` construyen y administran las dependencias por cuenta. En ejecución, cuando un ViewModel llama a un contrato de dominio, la operación se ejecuta en su repositorio concreto. Compose vuelve a dibujar la interfaz cuando cambia el estado observable.

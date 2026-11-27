@@ -50,3 +50,7 @@ No se despliegan V5/V6 en EC2 ni se actualiza el teléfono como parte de esta im
 ## Revisión posterior
 
 La revisión interactiva, las correcciones del despliegue histórico y la comprobación de recuperación del JAR anterior con V6 se describen en [Revisión previa a integración](20-REVISION-PREINTEGRACION.md). La inspección posterior encontró una sesión activa de estudiante en el emulador y permitió verificar el filtro con el catálogo real; las referencias anteriores a sesión cerrada describen el momento de instalación.
+
+## Despliegue posterior confirmado
+
+Una vez integrada la cadena en develop, se desplegaron V5/V6 conservando datos y ENFORCE. La operación y sus verificaciones están en [Despliegue de códigos públicos](23-DESPLIEGUE-CODIGOS-PUBLICOS.md). Las referencias anteriores a EC2 en V4 describen la fase previa al despliegue.
