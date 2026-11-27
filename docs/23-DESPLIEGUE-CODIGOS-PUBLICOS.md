@@ -63,3 +63,5 @@ El APK principal de develop está compilado y preparado. Al terminar el desplieg
 El usuario conectó y autorizó posteriormente su Moto g82. La instalación con `adb install -r` fue rechazada con INSTALL_FAILED_UPDATE_INCOMPATIBLE: el certificado de la app instalada difiere del APK construido con la clave debug disponible en este PC. No se desinstaló, no se borraron datos ni se alteraron permisos.
 
 Se verificaron ambos certificados públicos y la configuración de firma de Gradle. La app instalada conserva Android 1.7.0, versionCode 10 y sus permisos de cámara/ubicación. La actualización principal requiere su clave original o una estrategia de instalación separada elegida por el usuario. No se puede conservar una firma simplemente copiando el certificado público; no se obtuvo ni publicó ninguna clave privada.
+
+El usuario eligió esperar la clave original. No se instaló una variante paralela ni se continuó con cambios en el teléfono. La prueba física final queda pendiente hasta disponer de una actualización firmada con la clave correspondiente.
