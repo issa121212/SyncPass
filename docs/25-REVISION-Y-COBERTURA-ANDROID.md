@@ -91,3 +91,11 @@ El usuario confirmó que el backend estaba apagado durante la primera revisión.
 - OPTIONS /api/eventos desde https://syncpassweb.vercel.app: 200 con ese origen permitido.
 
 Esto confirma disponibilidad, rechazo de esas consultas sin autenticación y respuesta del preflight para ese origen. No acredita aún autorización con sesiones reales, sincronización entre clientes ni asistencia dentro/fuera del radio. Las comprobaciones funcionales anteriores siguen pendientes; el bloqueo de disponibilidad quedó resuelto.
+
+## Preparación de prueba geográfica real
+
+A petición del usuario se creó el evento temporal **Prueba radio 27-11**, código público **EVT-6F93B9480135**, bajo reciclaje comuna: programado el 27-11-2026 a las 14:00, 5 cupos y radio de 100 metros. La zona inicial es un punto público lejano en Madrid, para comprobar el rechazo desde el teléfono en Chile sin simular su GPS.
+
+Se preparó como fixture mediante una transacción PostgreSQL en EC2, no mediante el formulario ni el endpoint de creación. La transacción comprobó el responsable docente, conservó las huellas de todos los eventos previos, utilizó la generación/reserva de código público de V6 y configuró el QR habitual. Esta preparación no acredita el CRUD ni sus controles de autorización.
+
+Desde la sesión participante de la web se actualizó el catálogo y se confirmó la inscripción mediante la interfaz y API reales. La web mostró 1 inscrito y 0 presentes; en Mis inscripciones quedó visible el QR personal para escanear desde el evento correcto en Android. El rechazo fuera del radio y la aceptación tras ajustar la zona siguen pendientes del escaneo físico.
