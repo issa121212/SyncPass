@@ -74,7 +74,7 @@ La API Gateway respondió 503 a /api/health, /api/eventos, /api/sync/capabilitie
 
 Falta ejecutar con el servicio disponible:
 
-- Escaneo de asistencia dentro y fuera del radio en ENFORCE, con ubicación física real y precisión suficiente.
+- Rechazo de ENFORCE con una captura fuera de zona que llegue efectivamente a la API. El bloqueo local fuera de zona y la aceptación real dentro ya se comprobaron en las secciones posteriores.
 - Confirmación en web de las creaciones offline, pérdida de respuesta y reintento sin duplicados contra la API desplegada.
 - Validación de autorización por rol con sesiones reales, incluyendo 401/403 según corresponda.
 - Recorrido visual manual con teclado, texto grande, rotación y pérdida real de conectividad. Los asserts automáticos no sustituyen esta revisión.
@@ -105,3 +105,13 @@ Desde la sesión participante de la web se actualizó el catálogo y se confirm�
 El usuario escaneó desde Android y reportó el mensaje de acercarse a la zona. Ese texto corresponde a AttendanceLocationPolicy de Android (Acércate al centro de la zona y vuelve a intentar el escaneo), que valida antes de guardar o enviar la captura. Una consulta posterior en EC2 confirmó que el evento de prueba conserva 1 inscrito y 0 presentes.
 
 Se confirma el bloqueo preventivo en el cliente y que la asistencia no quedó presente. Este resultado no acredita por sí solo una respuesta 422 de ENFORCE del backend: el cliente puede detener la captura antes de enviarla. La prueba de aceptación dentro de zona sigue pendiente. La fecha existente de una fila de asistencia no se interpreta como presencia; la inscripción crea una fila con es_presente=false.
+
+## Aceptación física dentro de zona y confirmación en web
+
+El teléfono tenía permisos preciso y aproximado concedidos y ubicación activa. La lectura reciente por red informaba 100 metros de precisión. Con radio de 100 metros, el máximo admitido era 50 metros, por lo que Android rechazó esa lectura correctamente. La lectura GPS más precisa disponible era antigua y no se reutilizó.
+
+Para esta prueba el usuario ajustó el radio a 300 metros, manteniendo las validaciones (precisión máxima admitida de 100 metros), y guardó la zona con Usar mi ubicación → Usar esta zona → Guardar. Se detectó primero que solo había cambiado el radio, conservando el centro lejano; tras confirmar ambos pasos se verificó que el centro remoto ya era el nuevo.
+
+La captura posterior quedó registrada en EC2 con es_presente=true, origen QR, validacion_geografica=VALIDADA, motivo_geografico=null y precisión de 100 metros. Conserva fecha de ubicación y UUID de captura. El evento tiene 1 inscrito y 1 presente. La sesión participante de la web mostró Asistencia registrada para Prueba radio 27-11.
+
+Quedan comprobados el bloqueo preventivo local fuera de zona, el rechazo local por precisión insuficiente para un radio pequeño, la edición real de zona desde Android, la aceptación geográfica del backend y la consulta del resultado desde web. No se debilitaron las reglas globales ni se simuló GPS. El rechazo directo 422 del backend no se acredita con el bloqueo local, porque esa captura se detuvo antes de enviarse.
